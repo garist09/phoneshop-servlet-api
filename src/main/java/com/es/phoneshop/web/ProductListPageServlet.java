@@ -11,24 +11,24 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-
 public class ProductListPageServlet extends HttpServlet {
     private ProductDao productDao;
+    private static final String attribute = "products";
+    private static final String path = "/WEB-INF/pages/productList.jsp";
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = new ArrayListProductDao();
     }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("products", productDao.findProducts());
+        request.setAttribute(attribute, productDao.findProducts());
         try {
             productDao.delete(2L);
         } catch (ProductNotFoundException e) {
-            e.printStackTrace();
+           System.out.println(e.getMessage());
         }
-        request.getRequestDispatcher("/WEB-INF/pages/productList.jsp").forward(request, response);
+        request.getRequestDispatcher(path).forward(request, response);
     }
 }

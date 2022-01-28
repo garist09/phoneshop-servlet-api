@@ -29,6 +29,7 @@ public class ProductListPageServletTest {
     private ServletConfig config;
 
     private ProductListPageServlet servlet = new ProductListPageServlet();
+    private static final String attribute = "products";
 
     @Before
     public void setup() throws ServletException {
@@ -40,6 +41,6 @@ public class ProductListPageServletTest {
     public void testDoGet() throws ServletException, IOException {
         servlet.doGet(request, response);
         verify(requestDispatcher).forward(request, response);
-        verify(request).setAttribute(eq("products"), any());
+        verify(request).setAttribute(eq(attribute), any());
     }
 }

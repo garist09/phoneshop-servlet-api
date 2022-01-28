@@ -7,9 +7,13 @@ public class Product {
     private Long id;
     private String code;
     private String description;
-    /** null means there is no price because the product is outdated or new */
+    /**
+     * null means there is no price because the product is outdated or new
+     */
     private BigDecimal price;
-    /** can be null if the price is null */
+    /**
+     * can be null if the price is null
+     */
     private Currency currency;
     private int stock;
     private String imageUrl;
@@ -17,22 +21,58 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
-        this.id = id;
-        this.code = code;
-        this.description = description;
-        this.price = price;
-        this.currency = currency;
-        this.stock = stock;
-        this.imageUrl = imageUrl;
-    }
-    public Product(String code, String description, BigDecimal price, Currency currency, int stock, String imageUrl) {
-        this.code = code;
-        this.description = description;
-        this.price = price;
-        this.currency = currency;
-        this.stock = stock;
-        this.imageUrl = imageUrl;
+    public static class Builder {
+        private Product product;
+
+        public Builder() {
+            product = new Product();
+        }
+
+        public Builder withId(Long id) {
+            product.id = id;
+            return this;
+        }
+
+        public Builder withCode(String code) {
+            product.code = code;
+            return this;
+        }
+
+        public Builder withDescription(String description) {
+            product.description = description;
+            return this;
+        }
+
+        public Builder withPrice(BigDecimal price) {
+            product.price = price;
+            return this;
+        }
+
+        public Builder withCurrency(Currency currency) {
+            product.currency = currency;
+            return this;
+        }
+
+        public Builder withStock(int stock) {
+            product.stock = stock;
+            return this;
+        }
+
+        public Builder withImageUrl(String imageUrl) {
+            product.imageUrl = imageUrl;
+            return this;
+        }
+
+        public Product build() {
+            if (product.getId() == null)
+            {
+                if (product.getCode() != null)
+                    product.setId((long) product.getCode().hashCode());
+                else
+                    product.setId((long) (Math.random() * 1000 + 1));
+            }
+            return product;
+        }
     }
 
     public Long getId() {

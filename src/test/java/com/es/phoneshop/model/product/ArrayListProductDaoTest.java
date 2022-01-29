@@ -4,15 +4,57 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import java.math.BigDecimal;
 import java.util.Currency;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.atLeast;
 
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+
+@RunWith(MockitoJUnitRunner.class)
 public class ArrayListProductDaoTest {
+    public static final int INT30 = 30;
+    public static final int INT70 = 70;
+    public static final int INT80 = 80;
+    public static final int INT100 = 100;
+    public static final int INT120 = 120;
+    public static final int INT170 = 170;
+    public static final int INT1000 = 1000;
+    public static final String USD = "USD";
+    public static final String L0 = "L0";
+    public static final String L1 = "L1";
+    public static final String L5 = "L5";
+    public static final String SGS = "sgs";
+    public static final String SAMSUNG_GALAXY_S = "Samsung Galaxy S";
+    public static final String NOKIA_3310 = "nokia3310";
+    public static final String NOKIA_33101 = "Nokia 3310";
+    public static final String SIEMENS_C_61 = "Siemens C61";
+    public static final String SIMC_61 = "simc61";
+    public static final String XPERIAXZ = "xperiaxz";
+    public static final String SONY_XPERIA_XZ = "Sony Xperia XZ";
+    public static final String PALMP = "palmp";
+    public static final String PALM_PIXI = "Palm Pixi";
+    public static final String IPHONE_6 = "iphone6";
+    public static final String APPLE_I_PHONE_6 = "Apple iPhone 6";
+    public static final String NOKIA_203310_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Nokia/Nokia%203310.jpg";
+    public static final String GALAXY_20_S_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg";
+    public static final String PALM_20_PIXI_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Palm/Palm%20Pixi.jpg";
+    public static final String APPLE_20_I_PHONE_206_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone%206.jpg";
+    public static final String SIEMENS_20_C_61_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg";
+    public static final String SONY_20_XPERIA_20_XZ_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Sony/Sony%20Xperia%20XZ.jpg";
+
+    public static final int MIN_NUMBER_OF_INVOCATIONS = 1;
+
     private ProductDao productDao;
-    private Currency usd;
+    private static final Currency usd = Currency.getInstance(USD);
 
     @Mock
     private Product product;
@@ -20,7 +62,6 @@ public class ArrayListProductDaoTest {
     @Before
     public void setup() {
         productDao = new ArrayListProductDao();
-        usd = Currency.getInstance("USD");
     }
 
     @Test
@@ -29,58 +70,58 @@ public class ArrayListProductDaoTest {
     }
 
     @Test
-    public void testGetProduct() throws ProductNotFoundException {
-        Product newProduct = new Product.Builder().withId(1L).withCode("sgs").withDescription("Samsung Galaxy S").withPrice(new BigDecimal(100)).withCurrency(usd).withStock(100).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg").build();
+    public void testGetProduct() throws ProductNotFoundException, IdNotFoundException {
+        Product newProduct = new Product.Builder().withId(L1).withCode(SGS).withDescription(SAMSUNG_GALAXY_S).withPrice(new BigDecimal(INT100)).withCurrency(usd).withStock(INT100).withImageUrl(GALAXY_20_S_JPG).build();
         productDao.save(newProduct);
-        assertEquals(newProduct, productDao.getProduct(1L));
+        assertEquals(newProduct, productDao.getProduct(L1));
     }
 
     @Test
-    public void testSaveNewId() throws ProductNotFoundException {
+    public void testSaveNewId() throws ProductNotFoundException, IdNotFoundException {
         int listSize = productDao.findProducts().size();
-        Product newProduct = new Product.Builder().withCode("nokia3310").withDescription("Nokia 3310").withPrice(new BigDecimal(70)).withCurrency(usd).withStock(100).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Nokia/Nokia%203310.jpg").build();
+        Product newProduct = new Product.Builder().withCode(NOKIA_3310).withDescription(NOKIA_33101).withPrice(new BigDecimal(INT70)).withCurrency(usd).withStock(INT100).withImageUrl(NOKIA_203310_JPG).build();
         productDao.save(newProduct);
         assertNotNull(newProduct.getId());
-        assertEquals(listSize + 1, productDao.findProducts().size());
+        assertEquals(listSize + MIN_NUMBER_OF_INVOCATIONS, productDao.findProducts().size());
         Product result = productDao.getProduct(newProduct.getId());
         assertEquals(newProduct, result);
-        assertEquals("nokia3310", result.getCode());
-        assertNotEquals("Siemens C61", result.getDescription());
+        assertEquals(NOKIA_3310, result.getCode());
+        assertNotEquals(SIEMENS_C_61, result.getDescription());
     }
 
     @Test
-    public void testSaveUsedId() throws ProductNotFoundException {
-        productDao.save(new Product.Builder().withId(1L).withCode("simc61").withDescription("Siemens C61").withPrice(new BigDecimal(80)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg").build());
+    public void testSaveUsedId() throws ProductNotFoundException, IdNotFoundException {
+        productDao.save(new Product.Builder().withId(L1).withCode(SIMC_61).withDescription(SIEMENS_C_61).withPrice(new BigDecimal(INT80)).withCurrency(usd).withStock(INT30).withImageUrl(SIEMENS_20_C_61_JPG).build());
         int listSize = productDao.findProducts().size();
-        Product product = new Product.Builder().withId(1L).withCode("xperiaxz").withDescription("Sony Xperia XZ").withPrice(new BigDecimal(120)).withCurrency(usd).withStock(100).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Sony/Sony%20Xperia%20XZ.jpg").build();
+        Product product = new Product.Builder().withId(L1).withCode(XPERIAXZ).withDescription(SONY_XPERIA_XZ).withPrice(new BigDecimal(INT120)).withCurrency(usd).withStock(INT100).withImageUrl(SONY_20_XPERIA_20_XZ_JPG).build();
         productDao.save(product);
-        assertTrue(product.getId() > 0);
+        assertNotNull(product.getId());
         assertEquals(listSize, productDao.findProducts().size());
-        Product result = productDao.getProduct(1L);
+        Product result = productDao.getProduct(L1);
         assertEquals(product, result);
-        assertNotEquals(30, result.getStock());
+        assertNotEquals(INT30, result.getStock());
         assertEquals(usd, result.getCurrency());
     }
+
     @Test
     public void testSave() {
         MockitoAnnotations.initMocks(this);
-        when(product.getId()).thenReturn(null);
+        when(product.getId()).thenReturn(L1);
         productDao.save(product);
-        verify(product, atLeast(1)).getId();
-        verify(product).setId(anyLong());
+        verify(product, atLeast(MIN_NUMBER_OF_INVOCATIONS)).getId();
     }
 
     @Test
-    public void testDeleteExistingProduct() throws ProductNotFoundException {
-        Product product = new Product.Builder().withId(0L).withCode("palmp").withDescription("Palm Pixi").withPrice(new BigDecimal(170)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Palm/Palm%20Pixi.jpg").build();
+    public void testDeleteExistingProduct() throws ProductNotFoundException, IdNotFoundException {
+        Product product = new Product.Builder().withId(L0).withCode(PALMP).withDescription(PALM_PIXI).withPrice(new BigDecimal(INT170)).withCurrency(usd).withStock(INT30).withImageUrl(PALM_20_PIXI_JPG).build();
         productDao.save(product);
-        productDao.save(new Product.Builder().withId(1L).withCode("iphone6").withDescription("Apple iPhone 6").withPrice(new BigDecimal(1000)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone%206.jpg").build());
-        productDao.delete(0L);
-        assertNotEquals(product, productDao.getProduct(1L));
+        productDao.save(new Product.Builder().withId(L1).withCode(IPHONE_6).withDescription(APPLE_I_PHONE_6).withPrice(new BigDecimal(INT1000)).withCurrency(usd).withStock(INT30).withImageUrl(APPLE_20_I_PHONE_206_JPG).build());
+        productDao.delete(L0);
+        assertNotEquals(product, productDao.getProduct(L1));
     }
 
     @Test(expected = ProductNotFoundException.class)
-    public void testDeleteNonExistingProduct() throws ProductNotFoundException {
-        productDao.delete(-5L);
+    public void testDeleteNonExistingProduct() throws ProductNotFoundException, IdNotFoundException {
+        productDao.delete(L5);
     }
 }

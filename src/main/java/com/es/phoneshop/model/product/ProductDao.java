@@ -3,8 +3,8 @@ package com.es.phoneshop.model.product;
 import java.util.List;
 
 public interface ProductDao {
-    Product getProduct(Long id) throws ProductNotFoundException;
+    Product getProduct(String id) throws ProductNotFoundException, IdNotFoundException;
     List<Product> findProducts();
     void save(Product product);
-    void delete(Long id) throws ProductNotFoundException;
+    void delete(String id) throws ProductNotFoundException, IdNotFoundException;
 }

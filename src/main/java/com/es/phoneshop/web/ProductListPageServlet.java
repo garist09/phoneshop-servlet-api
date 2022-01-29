@@ -1,6 +1,7 @@
 package com.es.phoneshop.web;
 
 import com.es.phoneshop.model.product.ArrayListProductDao;
+import com.es.phoneshop.model.product.IdNotFoundException;
 import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.product.ProductNotFoundException;
 
@@ -25,8 +26,8 @@ public class ProductListPageServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setAttribute(attribute, productDao.findProducts());
         try {
-            productDao.delete(2L);
-        } catch (ProductNotFoundException e) {
+            productDao.delete("2L");
+        } catch (ProductNotFoundException | IdNotFoundException e) {
            System.out.println(e.getMessage());
         }
         request.getRequestDispatcher(path).forward(request, response);

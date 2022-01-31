@@ -52,6 +52,7 @@ public class ArrayListProductDaoTest {
     public static final String SONY_20_XPERIA_20_XZ_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Sony/Sony%20Xperia%20XZ.jpg";
 
     public static final int MIN_NUMBER_OF_INVOCATIONS = 1;
+    public static final int NUMBER1 = 1;
 
     private ProductDao productDao;
     private static final Currency usd = Currency.getInstance(USD);
@@ -77,30 +78,51 @@ public class ArrayListProductDaoTest {
     }
 
     @Test
-    public void testSaveNewId() throws ProductNotFoundException, IdNotFoundException {
-        int listSize = productDao.findProducts().size();
+    public void productsShouldEqualsWhenSavingProduct() throws ProductNotFoundException, IdNotFoundException {
         Product newProduct = new Product.Builder().withCode(NOKIA_3310).withDescription(NOKIA_33101).withPrice(new BigDecimal(INT70)).withCurrency(usd).withStock(INT100).withImageUrl(NOKIA_203310_JPG).build();
         productDao.save(newProduct);
-        assertNotNull(newProduct.getId());
-        assertEquals(listSize + MIN_NUMBER_OF_INVOCATIONS, productDao.findProducts().size());
         Product result = productDao.getProduct(newProduct.getId());
         assertEquals(newProduct, result);
+    }
+
+    @Test
+    public void getCodeShouldEquals() throws ProductNotFoundException, IdNotFoundException {
+        Product newProduct = new Product.Builder().withCode(NOKIA_3310).withDescription(NOKIA_33101).withPrice(new BigDecimal(INT70)).withCurrency(usd).withStock(INT100).withImageUrl(NOKIA_203310_JPG).build();
+        productDao.save(newProduct);
+        Product result = productDao.getProduct(newProduct.getId());
         assertEquals(NOKIA_3310, result.getCode());
+    }
+
+    @Test
+    public void getDescriptionShouldNotEquals() throws ProductNotFoundException, IdNotFoundException {
+        Product newProduct = new Product.Builder().withCode(NOKIA_3310).withDescription(NOKIA_33101).withPrice(new BigDecimal(INT70)).withCurrency(usd).withStock(INT100).withImageUrl(NOKIA_203310_JPG).build();
+        productDao.save(newProduct);
+        Product result = productDao.getProduct(newProduct.getId());
         assertNotEquals(SIEMENS_C_61, result.getDescription());
     }
 
     @Test
-    public void testSaveUsedId() throws ProductNotFoundException, IdNotFoundException {
+    public void shouldEqualsWhenComparingListSize() {
+        int listSize = productDao.findProducts().size();
+        Product newProduct = new Product.Builder().withCode(NOKIA_3310).withDescription(NOKIA_33101).withPrice(new BigDecimal(INT70)).withCurrency(usd).withStock(INT100).withImageUrl(NOKIA_203310_JPG).build();
+        productDao.save(newProduct);
+        assertEquals(listSize + NUMBER1, productDao.findProducts().size());
+    }
+
+    @Test
+    public void getIdShouldReturnNotNull() {
+        Product newProduct = new Product.Builder().withCode(NOKIA_3310).withDescription(NOKIA_33101).withPrice(new BigDecimal(INT70)).withCurrency(usd).withStock(INT100).withImageUrl(NOKIA_203310_JPG).build();
+        assertNotNull(newProduct.getId());
+    }
+
+    @Test
+    public void productsAndSizesShouldEqualsWhenSavingProductWithTheSameId() throws ProductNotFoundException, IdNotFoundException {
         productDao.save(new Product.Builder().withId(L1).withCode(SIMC_61).withDescription(SIEMENS_C_61).withPrice(new BigDecimal(INT80)).withCurrency(usd).withStock(INT30).withImageUrl(SIEMENS_20_C_61_JPG).build());
         int listSize = productDao.findProducts().size();
         Product product = new Product.Builder().withId(L1).withCode(XPERIAXZ).withDescription(SONY_XPERIA_XZ).withPrice(new BigDecimal(INT120)).withCurrency(usd).withStock(INT100).withImageUrl(SONY_20_XPERIA_20_XZ_JPG).build();
         productDao.save(product);
-        assertNotNull(product.getId());
         assertEquals(listSize, productDao.findProducts().size());
-        Product result = productDao.getProduct(L1);
-        assertEquals(product, result);
-        assertNotEquals(INT30, result.getStock());
-        assertEquals(usd, result.getCurrency());
+        assertEquals(product, productDao.getProduct(L1));
     }
 
     @Test
@@ -108,7 +130,7 @@ public class ArrayListProductDaoTest {
         MockitoAnnotations.initMocks(this);
         when(product.getId()).thenReturn(L1);
         productDao.save(product);
-        verify(product, atLeast(MIN_NUMBER_OF_INVOCATIONS)).getId();
+        verify(product, atLeast(NUMBER1)).getId();
     }
 
     @Test

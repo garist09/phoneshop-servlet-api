@@ -62,7 +62,7 @@ public class ArrayListProductDaoTest {
 
     @Before
     public void setup() {
-        productDao = new ArrayListProductDao();
+        productDao = ArrayListProductDao.getInstance();
     }
 
     @Test
@@ -130,7 +130,8 @@ public class ArrayListProductDaoTest {
         MockitoAnnotations.initMocks(this);
         when(product.getId()).thenReturn(L1);
         productDao.save(product);
-        verify(product, atLeast(NUMBER1)).getId();
+        productDao.getProduct(L1);
+        verify(product, atLeast(MIN_NUMBER_OF_INVOCATIONS)).getId();
     }
 
     @Test

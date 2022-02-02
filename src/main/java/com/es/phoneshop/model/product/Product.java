@@ -1,8 +1,13 @@
 package com.es.phoneshop.model.product;
 
 import java.math.BigDecimal;
-import java.util.Currency;
+import java.util.ArrayList;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.Currency;
+import java.util.Map;
+import java.util.List;
+
 
 public class Product {
     private String id;
@@ -12,6 +17,7 @@ public class Product {
     private Currency currency;
     private int stock;
     private String imageUrl;
+    private List<Map.Entry<String, BigDecimal>> priceHistory;
 
     public Product() {
     }
@@ -21,6 +27,7 @@ public class Product {
 
         public Builder() {
             product = new Product();
+            product.priceHistory = new ArrayList<>();
         }
 
         public Builder withId(String id) {
@@ -58,11 +65,24 @@ public class Product {
             return this;
         }
 
+        public Builder withPriceHistory(Map.Entry<String, BigDecimal>... priceHistory) {
+            product.priceHistory.addAll(Arrays.asList(priceHistory));
+            return this;
+        }
+
         public Product build() {
             if (product.getId() == null)
                 product.setId(UUID.randomUUID().toString().replaceAll("-", ""));
             return product;
         }
+    }
+
+    public List<Map.Entry<String, BigDecimal>> getPriceHistory() {
+        return priceHistory;
+    }
+
+    public void setPriceHistory(List<Map.Entry<String, BigDecimal>> priceHistory) {
+        this.priceHistory = priceHistory;
     }
 
     public String getId() {

@@ -1,19 +1,25 @@
 package com.es.phoneshop.model.product;
 
-import java.math.BigDecimal;
-
-import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Comparator;
+import java.util.Arrays;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ArrayListProductDao implements ProductDao {
     private List<Product> products;
+    private static ProductDao instance;
 
-    public ArrayListProductDao() {
+    private ArrayListProductDao() {
         this.products = new ArrayList<>();
-        saveSampleProducts();
+    }
+
+    public static synchronized ProductDao getInstance() {
+        if (instance == null)
+            instance = new ArrayListProductDao();
+        return instance;
     }
 
     @Override
@@ -31,6 +37,30 @@ public class ArrayListProductDao implements ProductDao {
         return products.stream()
                 .filter(product -> product.getPrice() != null)
                 .filter(this::productIsInStock)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public synchronized List<Product> findProducts(String query, SortField sortField, SortOrder sortOrder) {
+        Comparator<Product> comparator = Comparator.comparing((p) -> false);
+        if (SortField.description == sortField)
+            comparator = Comparator.comparing(Product::getDescription);
+        else if (SortField.price == sortField)
+            comparator = Comparator.comparing(Product::getPrice);
+        Stream<Product> stream = products.stream();
+        if (!Objects.equals(query, "") && query != null) {
+            String[] words = query.split(" ");
+            comparator = comparator.thenComparing(Product::getDescription, (p1, p2) ->
+                    Integer.compare(p1.split(" ").length, p2.split(" ").length));
+            stream = stream
+                    .filter(product -> Arrays.stream(words).allMatch(word -> product.getDescription().contains(word)));
+        }
+        if (SortOrder.desc == sortOrder)
+            comparator = comparator.reversed();
+        return stream
+                .filter(product -> product.getPrice() != null)
+                .filter(this::productIsInStock)
+                .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
@@ -59,22 +89,5 @@ public class ArrayListProductDao implements ProductDao {
                 .collect(Collectors.toList());
         if (size == products.size())
             throw new ProductNotFoundException();
-    }
-
-    private void saveSampleProducts() {
-        Currency usd = Currency.getInstance("USD");
-        save(new Product.Builder().withCode("sgs").withDescription("Samsung Galaxy S").withPrice(new BigDecimal(100)).withCurrency(usd).withStock(100).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg").build());
-        save(new Product.Builder().withCode("sgs2").withDescription("Samsung Galaxy S II").withPrice(new BigDecimal(200)).withCurrency(usd).withStock(0).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg").build());
-        save(new Product.Builder().withCode("sgs3").withDescription("Samsung Galaxy S III").withPrice(new BigDecimal(300)).withCurrency(usd).withStock(5).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20III.jpg").build());
-        save(new Product.Builder().withCode("iphone").withDescription("Apple iPhone").withPrice(new BigDecimal(200)).withCurrency(usd).withStock(10).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg").build());
-        save(new Product.Builder().withCode("iphone6").withDescription("Apple iPhone 6").withPrice(new BigDecimal(1000)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone%206.jpg").build());
-        save(new Product.Builder().withCode("htces4g").withDescription("HTC EVO Shift 4G").withPrice(new BigDecimal(320)).withCurrency(usd).withStock(3).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/HTC/HTC%20EVO%20Shift%204G.jpg").build());
-        save(new Product.Builder().withCode("sec901").withDescription("Sony Ericsson C901").withPrice(new BigDecimal(420)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Sony/Sony%20Ericsson%20C901.jpg").build());
-        save(new Product.Builder().withCode("xperiaxz").withDescription("Sony Xperia XZ").withPrice(new BigDecimal(100)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Sony/Sony%20Xperia%20XZ.jpg").build());
-        save(new Product.Builder().withCode("nokia3310").withDescription("Nokia 3310").withPrice(new BigDecimal(70)).withCurrency(usd).withStock(100).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Nokia/Nokia%203310.jpg").build());
-        save(new Product.Builder().withCode("palmp").withDescription("Palm Pixi").withPrice(new BigDecimal(170)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Palm/Palm%20Pixi.jpg").build());
-        save(new Product.Builder().withCode("simc56").withDescription("Siemens C56").withPrice(new BigDecimal(70)).withCurrency(usd).withStock(20).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C56.jpg").build());
-        save(new Product.Builder().withCode("simc61").withDescription("Siemens C61").withPrice(new BigDecimal(80)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg").build());
-        save(new Product.Builder().withCode("simsxg75").withDescription("Siemens SXG75").withPrice(new BigDecimal(150)).withCurrency(usd).withStock(40).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20SXG75.jpg").build());
     }
 }

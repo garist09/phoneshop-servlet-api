@@ -13,8 +13,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ProductPriceHistoryPageServlet extends HttpServlet {
-    private ProductDao productDao;
     private static final String path = "/WEB-INF/pages/productPrice.jsp";
+    public static final String PRODUCT = "product";
+    public static final String CURRENT_DATE = "currentDate";
+    public static final String DD_MM_YYYY = "dd.MM.yyyy";
+    public static final int BEGIN_INDEX = 1;
+
+    private ProductDao productDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -24,9 +29,9 @@ public class ProductPriceHistoryPageServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = request.getPathInfo().substring(1);
-        request.setAttribute("product", productDao.getProduct(id));
-        request.setAttribute("currentDate", new SimpleDateFormat("dd.MM.yyyy").format(new Date()));
+        String id = request.getPathInfo().substring(BEGIN_INDEX);
+        request.setAttribute(PRODUCT, productDao.getProduct(id));
+        request.setAttribute(CURRENT_DATE, new SimpleDateFormat(DD_MM_YYYY).format(new Date()));
         request.getRequestDispatcher(path).forward(request, response);
     }
 }

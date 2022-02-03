@@ -17,12 +17,15 @@ public class Product {
     private Currency currency;
     private int stock;
     private String imageUrl;
-    private List<Map.Entry<String, BigDecimal>> priceHistory;
+    private List<PriceHistoryItem> priceHistory;
 
     public Product() {
     }
 
     public static class Builder {
+        public static final String REGEX = "-";
+        public static final String REPLACEMENT = "";
+
         private Product product;
 
         public Builder() {
@@ -65,23 +68,24 @@ public class Product {
             return this;
         }
 
-        public Builder withPriceHistory(Map.Entry<String, BigDecimal>... priceHistory) {
+        public Builder withPriceHistory(PriceHistoryItem... priceHistory) {
             product.priceHistory.addAll(Arrays.asList(priceHistory));
             return this;
         }
 
         public Product build() {
-            if (product.getId() == null)
-                product.setId(UUID.randomUUID().toString().replaceAll("-", ""));
+            if (product.getId() == null) {
+                product.setId(UUID.randomUUID().toString().replaceAll(REGEX, REPLACEMENT));
+            }
             return product;
         }
     }
 
-    public List<Map.Entry<String, BigDecimal>> getPriceHistory() {
+    public List<PriceHistoryItem> getPriceHistory() {
         return priceHistory;
     }
 
-    public void setPriceHistory(List<Map.Entry<String, BigDecimal>> priceHistory) {
+    public void setPriceHistory(List<PriceHistoryItem> priceHistory) {
         this.priceHistory = priceHistory;
     }
 

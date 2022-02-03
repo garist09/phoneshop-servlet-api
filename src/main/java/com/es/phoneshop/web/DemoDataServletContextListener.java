@@ -1,9 +1,7 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.product.ProductDao;
-import com.es.phoneshop.model.product.ArrayListProductDao;
-import com.es.phoneshop.model.product.ProductNotFoundException;
-import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.*;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -14,21 +12,21 @@ import java.util.Currency;
 import java.util.List;
 
 public class DemoDataServletContextListener implements ServletContextListener {
-
     public static final String INSERT_DEMO_DATA = "insertDemoData";
     public static final String TRUE = "true";
     public static final String FAILED = "Failed to insert demo data";
+
     private ProductDao productDao;
 
     public DemoDataServletContextListener() {
         productDao = ArrayListProductDao.getInstance();
-
     }
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        if (servletContextEvent.getServletContext().getInitParameter(INSERT_DEMO_DATA).equals(TRUE)) {
-            for (Product product : saveSampleProducts()) {
+        if (StringUtils.compare(servletContextEvent.getServletContext().getInitParameter(INSERT_DEMO_DATA), TRUE) == 0) {
+            List<Product> sampleProducts = getSampleProducts();
+            for (Product product : sampleProducts) {
                 try {
                     productDao.save(product);
                 } catch (ProductNotFoundException e) {
@@ -40,14 +38,13 @@ public class DemoDataServletContextListener implements ServletContextListener {
 
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
-
     }
 
-    private List<Product> saveSampleProducts() {
+    private List<Product> getSampleProducts() {
         List<Product> products = new ArrayList<>();
         Currency usd = Currency.getInstance("USD");
         products.add(new Product.Builder().withCode("sgs").withDescription("Samsung Galaxy S").withPrice(new BigDecimal(100)).withCurrency(usd).withStock(100).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S.jpg").withPriceHistory(makePair("09.01.2019", new BigDecimal(125)), makePair("09.01.2020", new BigDecimal(115))).build());
-        products.add(new Product.Builder().withCode("sgs2").withDescription("Samsung Galaxy S II").withPrice(new BigDecimal(200)).withCurrency(usd).withStock(0).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg").withPriceHistory(makePair("27.03.2020", new BigDecimal(170)), makePair("28.05.2020", new BigDecimal(190)),makePair("28.10.2020", new BigDecimal(200))).build());
+        products.add(new Product.Builder().withCode("sgs2").withDescription("Samsung Galaxy S II").withPrice(new BigDecimal(200)).withCurrency(usd).withStock(0).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg").withPriceHistory(makePair("27.03.2020", new BigDecimal(170)), makePair("28.05.2020", new BigDecimal(190)), makePair("28.10.2020", new BigDecimal(200))).build());
         products.add(new Product.Builder().withCode("sgs3").withDescription("Samsung Galaxy S III").withPrice(new BigDecimal(300)).withCurrency(usd).withStock(5).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20III.jpg").withPriceHistory(makePair("20.01.2019", new BigDecimal(320)), makePair("09.04.2020", new BigDecimal(310)), makePair("30.09.2020", new BigDecimal(330))).build());
         products.add(new Product.Builder().withCode("iphone").withDescription("Apple iPhone").withPrice(new BigDecimal(200)).withCurrency(usd).withStock(10).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone.jpg").withPriceHistory(makePair("04.09.2020", new BigDecimal(150)), makePair("05.11.2020", new BigDecimal(180))).build());
         products.add(new Product.Builder().withCode("iphone6").withDescription("Apple iPhone 6").withPrice(new BigDecimal(1000)).withCurrency(usd).withStock(30).withImageUrl("https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone%206.jpg").withPriceHistory(makePair("03.02.2020", new BigDecimal(900)), makePair("02.12.2021", new BigDecimal(950))).build());
@@ -62,7 +59,7 @@ public class DemoDataServletContextListener implements ServletContextListener {
         return products;
     }
 
-    private AbstractMap.SimpleEntry<String, BigDecimal> makePair(String date, BigDecimal price) {
-        return new AbstractMap.SimpleEntry<>(date, price);
+    private PriceHistoryItem makePair(String date, BigDecimal price) {
+        return new PriceHistoryItem(date, price);
     }
 }

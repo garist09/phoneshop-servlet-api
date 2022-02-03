@@ -3,6 +3,7 @@ package com.es.phoneshop.web;
 import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.product.ProductNotFoundException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,6 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,9 +34,10 @@ public class ProductDetailsPageServletTest {
     public static final int INT10 = 10;
     public static final String GALAXY_20_S_20_II_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg";
     public static final String STRING = "/";
+
     private ProductDetailsPageServlet productDetailsPageServlet;
-    ProductDao productDao;
-    Product product;
+    private ProductDao productDao;
+    private Product product;
 
     @Mock
     private HttpServletRequest request;
@@ -57,14 +58,25 @@ public class ProductDetailsPageServletTest {
         productDetailsPageServlet = new ProductDetailsPageServlet();
         productDetailsPageServlet.init(config);
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
-        when(request.getPathInfo()).thenReturn(STRING + product.getId());
     }
 
     @Test
-    public void doGet() throws ServletException, IOException {
+    public void doGetShouldForwardWhenGettingExistingId() throws ServletException, IOException {
         productDao.save(product);
+        when(request.getPathInfo()).thenReturn(STRING + product.getId());
+
         productDetailsPageServlet.doGet(request, response);
+
         verify(request).setAttribute(PRODUCT, product);
         verify(requestDispatcher).forward(request, response);
     }
+
+    @Test(expected = ProductNotFoundException.class)
+    public void doGetShouldThrowProductNotFoundExceptionWhenIdIsNotFound() throws ServletException, IOException {
+        productDao.save(product);
+        when(request.getPathInfo()).thenReturn(STRING);
+
+        productDetailsPageServlet.doGet(request, response);
+    }
+
 }

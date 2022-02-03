@@ -1,5 +1,7 @@
 package com.es.phoneshop.model.product;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -17,15 +19,17 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     public static synchronized ProductDao getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new ArrayListProductDao();
+        }
         return instance;
     }
 
     @Override
     public synchronized Product getProduct(String id) throws ProductNotFoundException, IdNotFoundException {
-        if (id == null)
+        if (id == null) {
             throw new IdNotFoundException();
+        }
         return products.stream()
                 .filter(product -> Objects.equals(id, product.getId()))
                 .findAny()
@@ -43,30 +47,33 @@ public class ArrayListProductDao implements ProductDao {
     @Override
     public synchronized List<Product> findProducts(String query, SortField sortField, SortOrder sortOrder) {
         Comparator<Product> comparator = Comparator.comparing((p) -> false);
-        if (SortField.description == sortField)
+        if (SortField.description.equals(sortField)) {
             comparator = Comparator.comparing(Product::getDescription);
-        else if (SortField.price == sortField)
+        } else if (SortField.price.equals(sortField)) {
             comparator = Comparator.comparing(Product::getPrice);
+        }
         Stream<Product> stream = products.stream();
-        if (!Objects.equals(query, "") && query != null) {
-            String[] words = query.split(" ");
-            comparator = comparator.thenComparing(Product::getDescription, (p1, p2) ->
-                    Integer.compare(p1.split(" ").length, p2.split(" ").length));
+        if (!StringUtils.isBlank(query)) {
+            String[] words = query.split(StringUtils.SPACE);
+            comparator = comparator.thenComparing(Product::getDescription, (firstDescription, secondDescription) ->
+                    Integer.compare(firstDescription.split(StringUtils.SPACE).length, secondDescription.split(StringUtils.SPACE).length));
             stream = stream
                     .filter(product -> Arrays.stream(words).allMatch(word -> product.getDescription().contains(word)));
         }
-        if (SortOrder.desc == sortOrder)
+        if (SortOrder.desc.equals(sortOrder)) {
             comparator = comparator.reversed();
+        }
         return stream
-                .filter(product -> product.getPrice() != null)
+                .filter(product -> Objects.nonNull(product.getPrice()))
                 .filter(this::productIsInStock)
                 .sorted(comparator)
                 .collect(Collectors.toList());
     }
 
     private boolean productIsInStock(Product product) {
-        if (product == null)
+        if (product == null) {
             return false;
+        }
         return product.getStock() > 0;
     }
 
@@ -81,13 +88,15 @@ public class ArrayListProductDao implements ProductDao {
 
     @Override
     public synchronized void delete(String id) throws ProductNotFoundException, IdNotFoundException {
-        if (id == null)
+        if (id == null) {
             throw new IdNotFoundException();
+        }
         int size = products.size();
         products = products.stream()
                 .filter(x -> !id.equals(x.getId()))
                 .collect(Collectors.toList());
-        if (size == products.size())
+        if (size == products.size()) {
             throw new ProductNotFoundException();
+        }
     }
 }

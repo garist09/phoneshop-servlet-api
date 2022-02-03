@@ -17,9 +17,9 @@
         </tr>
         <c:forEach var="pair" items="${product.priceHistory}">
             <tr>
-                <td>${pair.key}</td>
+                <td>${pair.startDate}</td>
                 <td>
-                    <fmt:formatNumber value="${pair.value}" type="currency" currencySymbol="${product.currency.symbol}"/>
+                    <fmt:formatNumber value="${pair.price}" type="currency" currencySymbol="${product.currency.symbol}"/>
                 </td>
             </tr>
         </c:forEach>

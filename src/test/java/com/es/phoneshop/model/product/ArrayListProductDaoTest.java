@@ -50,7 +50,6 @@ public class ArrayListProductDaoTest {
     public static final String APPLE_20_I_PHONE_206_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Apple/Apple%20iPhone%206.jpg";
     public static final String SIEMENS_20_C_61_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Siemens/Siemens%20C61.jpg";
     public static final String SONY_20_XPERIA_20_XZ_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Sony/Sony%20Xperia%20XZ.jpg";
-
     public static final int MIN_NUMBER_OF_INVOCATIONS = 1;
     public static final int NUMBER1 = 1;
 

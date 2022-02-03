@@ -5,7 +5,6 @@ import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.ProductNotFoundException;
 import com.es.phoneshop.model.product.SortField;
 import com.es.phoneshop.model.product.SortOrder;
-import com.es.phoneshop.model.product.IdNotFoundException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,9 +14,13 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class ProductListPageServlet extends HttpServlet {
-    private ProductDao productDao;
+    public static final String SORT = "sort";
     private static final String attribute = "products";
     private static final String path = "/WEB-INF/pages/productList.jsp";
+    public static final String SEARCH_MOBILE = "searchMobile";
+    public static final String ORDER = "order";
+
+    private ProductDao productDao;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -25,13 +28,16 @@ public class ProductListPageServlet extends HttpServlet {
         productDao = ArrayListProductDao.getInstance();
 
     }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String query = request.getParameter("searchMobile");
-        String sortField = request.getParameter("sort");
-        String sortOrder = request.getParameter("order");
+        String query = request.getParameter(SEARCH_MOBILE);
+        String sortField = request.getParameter(SORT);
+        String sortOrder = request.getParameter(ORDER);
         try {
-            request.setAttribute(attribute, productDao.findProducts(query, Optional.ofNullable(sortField).map(field -> SortField.valueOf(field)).orElse(null), Optional.ofNullable(sortOrder).map(order -> SortOrder.valueOf(order)).orElse(null)));
+            request.setAttribute(attribute, productDao.findProducts(query,
+                    Optional.ofNullable(sortField).map(field -> SortField.valueOf(field)).orElse(null),
+                    Optional.ofNullable(sortOrder).map(order -> SortOrder.valueOf(order)).orElse(null)));
         } catch (ProductNotFoundException e) {
             System.out.println(e.getMessage());
         }

@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDetailsPageServletTest {
-
     public static final String PRODUCT = "product";
     public static final String SGS_2 = "sgs2";
     public static final String SAMSUNG_GALAXY_S_II = "Samsung Galaxy S II";

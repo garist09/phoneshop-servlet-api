@@ -1,12 +1,16 @@
 package com.es.phoneshop.web;
 
-import com.es.phoneshop.model.product.*;
+
+import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.model.product.ArrayListProductDao;
+import com.es.phoneshop.model.product.PriceHistoryItem;
+import com.es.phoneshop.model.product.ProductDao;
+import com.es.phoneshop.model.product.ProductNotFoundException;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.math.BigDecimal;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Currency;
 import java.util.List;

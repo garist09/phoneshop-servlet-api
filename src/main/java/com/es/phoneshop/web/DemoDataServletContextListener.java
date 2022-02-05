@@ -6,6 +6,7 @@ import com.es.phoneshop.model.product.ArrayListProductDao;
 import com.es.phoneshop.model.product.PriceHistoryItem;
 import com.es.phoneshop.model.product.ProductDao;
 import com.es.phoneshop.model.product.ProductNotFoundException;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.ServletContextEvent;
@@ -28,7 +29,7 @@ public class DemoDataServletContextListener implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent servletContextEvent) {
-        if (StringUtils.compare(servletContextEvent.getServletContext().getInitParameter(INSERT_DEMO_DATA), TRUE) == 0) {
+        if (BooleanUtils.toBoolean(servletContextEvent.getServletContext().getInitParameter(INSERT_DEMO_DATA))) {
             List<Product> sampleProducts = getSampleProducts();
             for (Product product : sampleProducts) {
                 try {

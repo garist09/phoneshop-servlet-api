@@ -32,3 +32,13 @@ img.product-tile {
 body.product-list {
 
 }
+
+img.cart {
+    display: inline-block;
+    margin: 21px 21px 0 0;
+    max-width: 42px;
+}
+
+.center {
+    text-align: center;
+}

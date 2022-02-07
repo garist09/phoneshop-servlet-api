@@ -28,18 +28,21 @@ public class ProductDetailsPageServlet extends HttpServlet {
 
     private ProductDao productDao;
     private CartService cartService;
+    private RecentlyViewedProducts recentlyViewedProducts;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = ArrayListProductDao.getInstance();
         cartService = CartServiceImpl.getInstance();
+        recentlyViewedProducts = RecentlyViewedProducts.getInstance();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getPathInfo().substring(BEGIN_INDEX);
         request.setAttribute(PRODUCT, productDao.getProduct(id));
+        recentlyViewedProducts.addProduct(request, id);
         request.getRequestDispatcher(path).forward(request, response);
     }
 

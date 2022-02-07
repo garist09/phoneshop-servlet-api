@@ -4,7 +4,7 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="product" type="com.es.phoneshop.model.product.Product" scope="request"/>
-<tags:master pageTitle="Product List">
+<tags:master pageTitle="Product Details">
     <p>
         ${product.description}
     </p>
@@ -34,4 +34,15 @@
             </td>
         </tr>
     </table>
+    <p>Quantity:
+        <form method="post">
+            <input name="quantity" value="${not empty param.quantity ? param.quantity : 1}">
+    <c:if test="${not empty error}">
+        <p>
+            ${error}
+        </p>
+    </c:if>
+            <button type="submit">Add to cart</button>
+        </form>
+    </p>
 </tags:master>

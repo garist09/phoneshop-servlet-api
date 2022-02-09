@@ -1,8 +1,9 @@
 package com.es.phoneshop.model.product;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.Arrays;
 import java.util.Currency;
@@ -74,7 +75,7 @@ public class Product {
         }
 
         public Product build() {
-            if (Objects.isNull(product.getId())) {
+            if (StringUtils.isBlank(product.getId())) {
                 product.setId(UUID.randomUUID().toString().replaceAll(REGEX, REPLACEMENT));
             }
             return product;

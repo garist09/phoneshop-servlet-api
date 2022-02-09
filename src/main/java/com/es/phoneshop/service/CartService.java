@@ -1,4 +1,4 @@
-package com.es.phoneshop.model.cart.service;
+package com.es.phoneshop.service;
 
 import com.es.phoneshop.exception.IdNotFoundException;
 import com.es.phoneshop.exception.OutOfStockException;
@@ -9,5 +9,5 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface CartService {
     Cart getCart(HttpServletRequest request);
-    void addProduct(HttpServletRequest request, String id, int quantity) throws IdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException;
+    void addProduct(HttpServletRequest request, String productId, int quantity) throws IdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException;
 }

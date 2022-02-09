@@ -32,7 +32,7 @@
     </h2>
     <table>
       <tr>
-        <c:forEach var="product" items="${recentlyViewed}">
+        <c:forEach var="product" items="${recentlyViewed.products}">
           <td class="center">
               <img class="product-tile" src="${product.imageUrl}">
               <br>

@@ -31,12 +31,12 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public synchronized Product getProduct(String id) throws ProductNotFoundException, IdNotFoundException {
-        if (Objects.isNull(id)) {
+    public synchronized Product getProduct(String productId) throws ProductNotFoundException, IdNotFoundException {
+        if (StringUtils.isBlank(productId)) {
             throw new IdNotFoundException();
         }
         return products.stream()
-                .filter(product -> Objects.equals(id, product.getId()))
+                .filter(product -> Objects.equals(productId, product.getId()))
                 .findAny()
                 .orElseThrow(ProductNotFoundException::new);
     }
@@ -92,13 +92,13 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public synchronized void delete(String id) throws ProductNotFoundException, IdNotFoundException {
-        if (Objects.isNull(id)) {
+    public synchronized void delete(String productId) throws ProductNotFoundException, IdNotFoundException {
+        if (StringUtils.isBlank(productId)) {
             throw new IdNotFoundException();
         }
         int size = products.size();
         products = products.stream()
-                .filter(x -> !id.equals(x.getId()))
+                .filter(x -> !productId.equals(x.getId()))
                 .collect(Collectors.toList());
         if (size == products.size()) {
             throw new ProductNotFoundException();

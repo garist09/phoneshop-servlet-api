@@ -1,5 +1,10 @@
-package com.es.phoneshop.model.product;
+package com.es.phoneshop.dao;
 
+import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.model.product.Product;
+import com.es.phoneshop.exception.ProductNotFoundException;
+import com.es.phoneshop.model.sortenum.SortField;
+import com.es.phoneshop.model.sortenum.SortOrder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -19,19 +24,19 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     public static synchronized ProductDao getInstance() {
-        if (instance == null) {
+        if (Objects.isNull(instance)) {
             instance = new ArrayListProductDao();
         }
         return instance;
     }
 
     @Override
-    public synchronized Product getProduct(String id) throws ProductNotFoundException, IdNotFoundException {
-        if (id == null) {
+    public synchronized Product getProduct(String productId) throws ProductNotFoundException, IdNotFoundException {
+        if (StringUtils.isBlank(productId)) {
             throw new IdNotFoundException();
         }
         return products.stream()
-                .filter(product -> Objects.equals(id, product.getId()))
+                .filter(product -> Objects.equals(productId, product.getId()))
                 .findAny()
                 .orElseThrow(ProductNotFoundException::new);
     }
@@ -71,7 +76,7 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     private boolean productIsInStock(Product product) {
-        if (product == null) {
+        if (Objects.isNull(product)) {
             return false;
         }
         return product.getStock() > 0;
@@ -87,13 +92,13 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public synchronized void delete(String id) throws ProductNotFoundException, IdNotFoundException {
-        if (id == null) {
+    public synchronized void delete(String productId) throws ProductNotFoundException, IdNotFoundException {
+        if (StringUtils.isBlank(productId)) {
             throw new IdNotFoundException();
         }
         int size = products.size();
         products = products.stream()
-                .filter(x -> !id.equals(x.getId()))
+                .filter(x -> !productId.equals(x.getId()))
                 .collect(Collectors.toList());
         if (size == products.size()) {
             throw new ProductNotFoundException();

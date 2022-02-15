@@ -14,6 +14,7 @@
       <img src="${pageContext.servletContext.contextPath}/images/logo.svg"/>
       PhoneShop
     </a>
+    <jsp:include page="/products/cart/miniCart"/>
       <a href="${pageContext.servletContext.contextPath}/products/cart">
         <img src="${pageContext.servletContext.contextPath}/images/cart.png" class="cart" align="right"/>
       </a>

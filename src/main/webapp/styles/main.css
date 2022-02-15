@@ -42,3 +42,57 @@ img.cart {
 .center {
     text-align: center;
 }
+
+.update-button {
+    background-image: url('../images/update.png');
+    background-size: 24px 24px;
+    height: 24px;
+    width: 24px;
+    border: none;
+    background-color: white;
+}
+
+.text-header {
+    font-size: 32px;
+    font-weight: bold;
+}
+.inline {
+    display: inline;
+}
+
+.plus-icon{
+    background-image: url('../images/plus.png');
+    background-size: 15px;
+    height: 15px;
+    width: 15px;
+    border:none;
+    background-color: white;
+}
+
+.minus-icon{
+    background-image: url('../images/minus.png');
+    background-size: 15px;
+    height: 15px;
+    width: 15px;
+    border:none;
+    background-color: white;
+}
+
+.text-body{
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+.cart-icon{
+    background-image: url('../images/bin.png');
+    background-size: 15px;
+    height: 15px;
+    width: 15px;
+    border:none;
+    background-color: white;
+    text-align: center;
+}
+.red{
+    color: red;
+    font-size: 18px;
+}

@@ -4,9 +4,16 @@
 <%@ taglib prefix="tags" tagdir="/WEB-INF/tags" %>
 
 <jsp:useBean id="cartList" type="java.util.ArrayList" scope="request"/>
+<jsp:useBean id="totalPrice" type="java.math.BigDecimal" scope="request"/>
 <tags:master pageTitle="Cart">
     <c:if test="${not empty cartList}">
-        <h1>Cart</h1>
+        <div class="text-header">
+            Cart
+            <form method="post" class="inline">
+                <button name="update" type="submit" class="update-button"></button>
+            </form>
+        </div>
+        <br>
         <table>
             <tr>
                 <td>
@@ -24,6 +31,7 @@
                 <td>
                     Total price
                 </td>
+                <td></td>
             </tr>
             <c:forEach var="cart" items="${cartList}">
                 <tr>
@@ -42,19 +50,49 @@
                         </a>
                     </td>
                     <td>
-                            ${cart.quantity}
+                        <div class="text-body">
+                            <form method="post" class="inline">
+                                <button name="remove" type="submit" class="minus-icon" value="${cart.product.id}">
+                                </button>
+                            </form>
+                                ${cart.quantity}
+                            <form method="post" class="inline">
+                                <button name="add" type="submit" class="plus-icon" value="${cart.product.id}">
+                                </button>
+                            </form>
+                        </div>
                     </td>
                     <td class="price">
                         <fmt:formatNumber value="${cart.product.price * cart.quantity}" type="currency"
                                           currencySymbol="${cart.product.currency.symbol}"/>
                     </td>
+                    <td>
+                        <form  method="post" action="${pageContext.request.contextPath}/products/cart/deleteCartItem/${cart.product.id}">
+                            <button name="delete" type="submit" class="cart-icon" value="${cart.product.id}">
+                            </button>
+                        </form>
+                    </td>
                 </tr>
             </c:forEach>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="price">
+                    <fmt:formatNumber value="${totalPrice.doubleValue()}" type="currency"
+                                      currencySymbol="${cartList.get(0).product.currency.symbol}"/>
+                </td>
+                <td></td>
+            </tr>
         </table>
     </c:if>
     <c:if test="${empty cartList}">
-        <h2>
+        <div class="text-header">
             There are no products in the cart
-        </h2>
+            <form method="post" class="inline">
+                <button name="update" type="submit" class="update-button"></button>
+            </form>
+        </div>
     </c:if>
 </tags:master>

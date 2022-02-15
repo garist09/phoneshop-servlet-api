@@ -2,15 +2,22 @@ package com.es.phoneshop.model.product;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.UUID;
+import java.util.Objects;
+import java.util.Random;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
 
 
-public class Product {
+public class Product implements Serializable {
+    public static final String CHARACTERS_FOR_GENERATION = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    public static final int SIZE_OF_GENERATED_UUID = 32;
+    public static final int RANDOM_SEED = 1;
+    private static final Random random;
+
     private String id;
     private String code;
     private String description;
@@ -20,13 +27,14 @@ public class Product {
     private String imageUrl;
     private List<PriceHistoryItem> priceHistory;
 
+    static {
+        random = new Random(RANDOM_SEED);
+    }
+
     public Product() {
     }
 
     public static class Builder {
-        public static final String REGEX = "-";
-        public static final String REPLACEMENT = "";
-
         private Product product;
 
         public Builder() {
@@ -76,10 +84,19 @@ public class Product {
 
         public Product build() {
             if (StringUtils.isBlank(product.getId())) {
-                product.setId(UUID.randomUUID().toString().replaceAll(REGEX, REPLACEMENT));
+                product.setId(generateUUID());
             }
             return product;
         }
+    }
+
+    private static String generateUUID() {
+        String UUIDCharacters = CHARACTERS_FOR_GENERATION;
+        StringBuilder UUID = new StringBuilder(SIZE_OF_GENERATED_UUID);
+        for (int i = 0; i < SIZE_OF_GENERATED_UUID; i++) {
+            UUID.append(UUIDCharacters.charAt(random.nextInt(UUIDCharacters.length())));
+        }
+        return UUID.toString();
     }
 
     public List<PriceHistoryItem> getPriceHistory() {
@@ -144,5 +161,18 @@ public class Product {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return stock == product.stock && Objects.equals(id, product.id) && Objects.equals(code, product.code) && Objects.equals(description, product.description) && Objects.equals(price, product.price) && Objects.equals(currency, product.currency) && Objects.equals(imageUrl, product.imageUrl) && Objects.equals(priceHistory, product.priceHistory);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, code, description, price, currency, stock, imageUrl, priceHistory);
     }
 }

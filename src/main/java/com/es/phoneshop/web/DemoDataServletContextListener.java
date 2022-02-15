@@ -17,7 +17,6 @@ import java.util.List;
 
 public class DemoDataServletContextListener implements ServletContextListener {
     public static final String INSERT_DEMO_DATA = "insertDemoData";
-    public static final String TRUE = "true";
     public static final String FAILED = "Failed to insert demo data";
 
     private ProductDao productDao;

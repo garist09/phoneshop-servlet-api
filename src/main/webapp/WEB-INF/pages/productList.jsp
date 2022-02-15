@@ -5,10 +5,16 @@
 
 <jsp:useBean id="products" type="java.util.ArrayList" scope="request"/>
 <tags:master pageTitle="Product List">
+  <br>
   <form>
     <input name="searchMobile" value="${param.searchMobile}">
     <button>Search</button>
   </form>
+  <c:if test="${not empty error}">
+    <p class="red">
+        ${error}
+    </p>
+  </c:if>
   <table>
     <thead>
     <tr>
@@ -17,6 +23,9 @@
           Description
           <tags:sortLink sort="description" order="asc"/>
           <tags:sortLink sort="description" order="desc"/>
+      </td>
+      <td>
+        Quantity
       </td>
       <td class="price">
           Price
@@ -35,10 +44,20 @@
             ${product.description}
           </a>
         </td>
+        <td>
+          <input name="quantity" value="1" form="${product.id}">
+        </td>
         <td class="price">
           <a href="${pageContext.servletContext.contextPath}/products/priceHistory/${product.id}">
             <fmt:formatNumber value="${product.price}" type="currency" currencySymbol="${product.currency.symbol}"/>
           </a>
+        </td>
+        <td>
+          <form name="${product.id}" method="post" id="${product.id}">
+            <button name="id" type="submit" value="${product.id}">
+              Add to Cart
+            </button>
+          </form>
         </td>
       </tr>
     </c:forEach>

@@ -37,11 +37,11 @@
     <p>Quantity:
         <form method="post">
             <input name="quantity" value="${not empty param.quantity ? param.quantity : 1}">
-    <c:if test="${not empty error}">
-        <p>
-            ${error}
-        </p>
-    </c:if>
+            <c:if test="${not empty error}">
+                <p class="red">
+                    ${error}
+                </p>
+            </c:if>
             <button type="submit">Add to cart</button>
         </form>
     </p>

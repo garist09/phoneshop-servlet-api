@@ -6,7 +6,7 @@ import com.es.phoneshop.exception.IdNotFoundException;
 import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.product.Product;
-import com.es.phoneshop.service.impl.HttpSessionCartService;
+import com.es.phoneshop.service.impl.HttpSessionCartServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,12 +26,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class HttpSessionCartServiceTest {
+public class HttpSessionCartServiceImplTest {
     public static final int NUMBER_OF_INVOCATIONS = 2;
-    public static final int QUANTITY9 = 9;
-    public static final int QUANTITY3 = 3;
+    public static final int POSITIVE_QUANTITY = 3;
     public static final int ZERO_QUANTITY = 0;
-    public static final int NEGATIVE_QUANTITY3 = -3;
+    public static final int NEGATIVE_QUANTITY = -3;
     public static final String PRODUCT_ID = "3";
 
     private CartService httpSessionCartService;
@@ -48,7 +47,7 @@ public class HttpSessionCartServiceTest {
 
     @Before
     public void setup() {
-        httpSessionCartService = HttpSessionCartService.getInstance();
+        httpSessionCartService = HttpSessionCartServiceImpl.getInstance();
         productDao = ArrayListProductDao.getInstance();
         when(request.getSession()).thenReturn(session);
     }
@@ -78,12 +77,12 @@ public class HttpSessionCartServiceTest {
 
     @Test(expected = IdNotFoundException.class)
     public void addProductShouldThrowIdNotFoundExceptionWhenProductIdIsNull() {
-        httpSessionCartService.addProduct(request, null, QUANTITY9);
+        httpSessionCartService.addProduct(request, null, POSITIVE_QUANTITY);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void addProductShouldThrowIllegalArgumentExceptionWhenQuantityIsNonPositive() {
-        httpSessionCartService.addProduct(request, PRODUCT_ID, NEGATIVE_QUANTITY3);
+        httpSessionCartService.addProduct(request, PRODUCT_ID, NEGATIVE_QUANTITY);
     }
 
     @Test(expected = OutOfStockException.class)
@@ -92,16 +91,16 @@ public class HttpSessionCartServiceTest {
         when(product.getStock()).thenReturn(ZERO_QUANTITY);
         productDao.save(product);
 
-        httpSessionCartService.addProduct(request, PRODUCT_ID, QUANTITY3);
+        httpSessionCartService.addProduct(request, PRODUCT_ID, POSITIVE_QUANTITY);
     }
 
     @Test
     public void addProductShouldAddProductToCartAndSetStockWhenAllParametersAreCorrect() {
         when(product.getId()).thenReturn(PRODUCT_ID);
-        when(product.getStock()).thenReturn(QUANTITY3);
+        when(product.getStock()).thenReturn(POSITIVE_QUANTITY);
         productDao.save(product);
 
-        httpSessionCartService.addProduct(request, PRODUCT_ID, QUANTITY3);
+        httpSessionCartService.addProduct(request, PRODUCT_ID, POSITIVE_QUANTITY);
 
         verify(product).setStock(anyInt());
     }

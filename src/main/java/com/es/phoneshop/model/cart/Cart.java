@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class Cart implements Serializable {
     private List<CartItem> cartItemList;
@@ -17,8 +15,7 @@ public class Cart implements Serializable {
         totalPrice = BigDecimal.ZERO;
     }
 
-    public List<CartItem> getProducts() {
-        cartItemList = cartItemList.stream().filter(this::quantityComparing).collect(Collectors.toList());
+    public List<CartItem> getCartItems() {
         return cartItemList;
     }
 
@@ -36,12 +33,5 @@ public class Cart implements Serializable {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
-    }
-
-    private boolean quantityComparing(CartItem cartItem) {
-        if (Objects.isNull(cartItem)) {
-            return false;
-        }
-        return cartItem.getQuantity() > 0;
     }
 }

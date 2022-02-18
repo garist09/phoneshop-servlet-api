@@ -75,10 +75,7 @@
                 </tr>
             </c:forEach>
             <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td colspan="4"></td>
                 <td class="price">
                     <fmt:formatNumber value="${totalPrice.doubleValue()}" type="currency"
                                       currencySymbol="${cartList.get(0).product.currency.symbol}"/>

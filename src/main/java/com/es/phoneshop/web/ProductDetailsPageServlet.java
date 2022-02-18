@@ -1,11 +1,11 @@
 package com.es.phoneshop.web;
 
 import com.es.phoneshop.service.CartService;
-import com.es.phoneshop.service.impl.HttpSessionCartService;
+import com.es.phoneshop.service.impl.HttpSessionCartServiceImpl;
 import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.dao.ArrayListProductDao;
-import com.es.phoneshop.service.impl.HttpSessionRecentlyViewedProductsService;
+import com.es.phoneshop.service.impl.HttpSessionRecentlyViewedProductsServiceImpl;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class ProductDetailsPageServlet extends HttpServlet {
@@ -22,22 +23,25 @@ public class ProductDetailsPageServlet extends HttpServlet {
     public static final String PRODUCT_ATTRIBUTE = "product";
     public static final int BEGIN_INDEX = 1;
     public static final String QUANTITY_PARAMETER = "quantity";
-    public static final String PURCHASED_JSP_PAGE = "/WEB-INF/pages/productIsPurchased.jsp";
     public static final String ERROR_ATTRIBUTE = "error";
     public static final String NOT_A_NUMBER_MESSAGE = "error.invalid.number.message";
     public static final String AVAILABLE_MESSAGE = "error.out.of.stock.message";
     public static final String NON_POSITIVE_QUANTITY = "error.not.positive.message";
+    public static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
+    public static final String SUCCESSFULLY_ADDED_TO_THE_CART = "The product has been successfully added to the cart";
 
+    private ResourceBundle errorMessages;
     private ProductDao productDao;
     private CartService cartService;
-    private HttpSessionRecentlyViewedProductsService recentlyViewedProducts;
+    private HttpSessionRecentlyViewedProductsServiceImpl recentlyViewedProducts;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = ArrayListProductDao.getInstance();
-        cartService = HttpSessionCartService.getInstance();
-        recentlyViewedProducts = HttpSessionRecentlyViewedProductsService.getInstance();
+        cartService = HttpSessionCartServiceImpl.getInstance();
+        recentlyViewedProducts = HttpSessionRecentlyViewedProductsServiceImpl.getInstance();
+        errorMessages = ResourceBundle.getBundle(ERROR_ATTRIBUTE, Locale.ENGLISH);
     }
 
     @Override
@@ -52,14 +56,13 @@ public class ProductDetailsPageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getPathInfo().substring(BEGIN_INDEX);
         String stringQuantity = request.getParameter(QUANTITY_PARAMETER);
-        int quantity;
-        ResourceBundle errorMessages = ResourceBundle.getBundle(ERROR_ATTRIBUTE, request.getLocale());
+        int quantity = 0;
+        NumberFormat format = NumberFormat.getInstance(request.getLocale());
+
         try {
-            NumberFormat format = NumberFormat.getInstance(request.getLocale());
             quantity = format.parse(stringQuantity).intValue();
             cartService.addProduct(request, id, quantity);
-            request.getRequestDispatcher(PURCHASED_JSP_PAGE).forward(request, response);
-            return;
+            request.setAttribute(SUCCESS_MESSAGE_ATTRIBUTE, SUCCESSFULLY_ADDED_TO_THE_CART);
         } catch (ParseException ex) {
             request.setAttribute(ERROR_ATTRIBUTE, errorMessages.getString(NOT_A_NUMBER_MESSAGE));
         } catch (OutOfStockException ex) {
@@ -67,6 +70,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
         } catch (IllegalArgumentException ex) {
             request.setAttribute(ERROR_ATTRIBUTE, errorMessages.getString(NON_POSITIVE_QUANTITY));
         }
+
         doGet(request, response);
     }
 }

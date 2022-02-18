@@ -15,10 +15,10 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Objects;
 
-public class HttpSessionRecentlyViewedProductsService implements RecentlyViewedProductsService {
+public class HttpSessionRecentlyViewedProductsServiceImpl implements RecentlyViewedProductsService {
     public static final String RECENTLY_VIEWED = "recentlyViewed";
 
-    private static HttpSessionRecentlyViewedProductsService instance;
+    private static HttpSessionRecentlyViewedProductsServiceImpl instance;
     private static final Object lock;
 
     private ProductDao productDao;
@@ -27,14 +27,14 @@ public class HttpSessionRecentlyViewedProductsService implements RecentlyViewedP
         lock = new Object();
     }
 
-    private HttpSessionRecentlyViewedProductsService() {
+    private HttpSessionRecentlyViewedProductsServiceImpl() {
         productDao = ArrayListProductDao.getInstance();
     }
 
-    public static HttpSessionRecentlyViewedProductsService getInstance() {
+    public static HttpSessionRecentlyViewedProductsServiceImpl getInstance() {
         if (Objects.isNull(instance)) {
             synchronized (lock) {
-                instance = new HttpSessionRecentlyViewedProductsService();
+                instance = new HttpSessionRecentlyViewedProductsServiceImpl();
             }
         }
         return instance;
@@ -56,14 +56,15 @@ public class HttpSessionRecentlyViewedProductsService implements RecentlyViewedP
     }
 
     @Override
-    public void addProduct(HttpServletRequest request, String productId) throws ProductNotFoundException, IdNotFoundException {
+    public void addProduct(HttpServletRequest request, String productId)
+            throws ProductNotFoundException, IdNotFoundException {
         if (StringUtils.isBlank(productId)) {
             throw new IdNotFoundException();
         }
         List<Product> productList = getRecentlyViewedProducts(request).getProducts();
         Product product = productDao.getProduct(productId);
         if (!productList.contains(product)) {
-            synchronized (request) {
+            synchronized (request.getSession()) {
                 if (productList.size() > NumberUtils.INTEGER_TWO) {
                     productList.remove(NumberUtils.INTEGER_ZERO.intValue());
                 }

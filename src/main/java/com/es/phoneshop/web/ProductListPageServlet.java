@@ -7,7 +7,7 @@ import com.es.phoneshop.exception.ProductNotFoundException;
 import com.es.phoneshop.model.sortenum.SortField;
 import com.es.phoneshop.model.sortenum.SortOrder;
 import com.es.phoneshop.service.CartService;
-import com.es.phoneshop.service.impl.HttpSessionCartService;
+import com.es.phoneshop.service.impl.HttpSessionCartServiceImpl;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -28,20 +28,23 @@ public class ProductListPageServlet extends HttpServlet {
     public static final String SEARCH_MOBILE = "searchMobile";
     public static final String ORDER = "order";
     public static final String QUANTITY_PARAMETER = "quantity";
-    public static final String PURCHASED_JSP_PAGE = "/WEB-INF/pages/productIsPurchased.jsp";
     public static final String ERROR_ATTRIBUTE = "error";
     public static final String NOT_A_NUMBER_MESSAGE = "error.invalid.number.message";
     public static final String AVAILABLE_MESSAGE = "error.out.of.stock.message";
     public static final String NON_POSITIVE_QUANTITY = "error.not.positive.message";
+    public static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
+    public static final String SUCCESSFULLY_ADDED_TO_THE_CART = "The product has been successfully added to the cart";
 
     private ProductDao productDao;
     private CartService cartService;
+    private ResourceBundle errorMessages;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
         productDao = ArrayListProductDao.getInstance();
-        cartService = HttpSessionCartService.getInstance();
+        cartService = HttpSessionCartServiceImpl.getInstance();
+        errorMessages = ResourceBundle.getBundle(ERROR_ATTRIBUTE);
     }
 
     @Override
@@ -63,14 +66,13 @@ public class ProductListPageServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter(ID_PARAMETER);
         String stringQuantity = request.getParameter(QUANTITY_PARAMETER);
-        int quantity;
-        ResourceBundle errorMessages = ResourceBundle.getBundle(ERROR_ATTRIBUTE, request.getLocale());
+        int quantity = 0;
+        NumberFormat format = NumberFormat.getInstance(request.getLocale());
+
         try {
-            NumberFormat format = NumberFormat.getInstance(request.getLocale());
             quantity = format.parse(stringQuantity).intValue();
             cartService.addProduct(request, id, quantity);
-            request.getRequestDispatcher(PURCHASED_JSP_PAGE).forward(request, response);
-            return;
+            request.setAttribute(SUCCESS_MESSAGE_ATTRIBUTE, SUCCESSFULLY_ADDED_TO_THE_CART);
         } catch (ParseException ex) {
             request.setAttribute(ERROR_ATTRIBUTE, errorMessages.getString(NOT_A_NUMBER_MESSAGE));
         } catch (OutOfStockException ex) {
@@ -78,6 +80,7 @@ public class ProductListPageServlet extends HttpServlet {
         } catch (IllegalArgumentException ex) {
             request.setAttribute(ERROR_ATTRIBUTE, errorMessages.getString(NON_POSITIVE_QUANTITY));
         }
+
         doGet(request, response);
     }
 }

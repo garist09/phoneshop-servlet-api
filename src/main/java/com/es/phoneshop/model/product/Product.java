@@ -10,11 +10,10 @@ import java.util.Random;
 import java.util.Arrays;
 import java.util.Currency;
 import java.util.List;
+import java.util.UUID;
 
 
 public class Product implements Serializable {
-    public static final String CHARACTERS_FOR_GENERATION = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    public static final int SIZE_OF_GENERATED_UUID = 32;
     public static final int RANDOM_SEED = 1;
     private static final Random random;
 
@@ -84,19 +83,10 @@ public class Product implements Serializable {
 
         public Product build() {
             if (StringUtils.isBlank(product.getId())) {
-                product.setId(generateUUID());
+                product.setId(new UUID(random.nextLong(),random.nextLong()).toString());
             }
             return product;
         }
-    }
-
-    private static String generateUUID() {
-        String UUIDCharacters = CHARACTERS_FOR_GENERATION;
-        StringBuilder UUID = new StringBuilder(SIZE_OF_GENERATED_UUID);
-        for (int i = 0; i < SIZE_OF_GENERATED_UUID; i++) {
-            UUID.append(UUIDCharacters.charAt(random.nextInt(UUIDCharacters.length())));
-        }
-        return UUID.toString();
     }
 
     public List<PriceHistoryItem> getPriceHistory() {
@@ -164,11 +154,18 @@ public class Product implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return stock == product.stock && Objects.equals(id, product.id) && Objects.equals(code, product.code) && Objects.equals(description, product.description) && Objects.equals(price, product.price) && Objects.equals(currency, product.currency) && Objects.equals(imageUrl, product.imageUrl) && Objects.equals(priceHistory, product.priceHistory);
+    public boolean equals(Object secondObject) {
+        if (this == secondObject) {
+            return true;
+        }
+        if (secondObject == null || getClass() != secondObject.getClass()) {
+            return false;
+        }
+        Product product = (Product) secondObject;
+        return stock == product.stock && Objects.equals(id, product.id) && Objects.equals(code, product.code)
+                && Objects.equals(description, product.description) && Objects.equals(price, product.price)
+                && Objects.equals(currency, product.currency) && Objects.equals(imageUrl, product.imageUrl)
+                && Objects.equals(priceHistory, product.priceHistory);
     }
 
     @Override

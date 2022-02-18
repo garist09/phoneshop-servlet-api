@@ -5,7 +5,7 @@ import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.exception.IdNotFoundException;
 import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.exception.ProductNotFoundException;
-import com.es.phoneshop.exception.QuantityOfBoundException;
+import com.es.phoneshop.exception.QuantityOutOfBoundException;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartItem;
 import com.es.phoneshop.service.CartService;
@@ -20,9 +20,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class HttpSessionCartService implements CartService {
+public class HttpSessionCartServiceImpl implements CartService {
     public static final String CART_ATTRIBUTE = "sessionCart";
-    public static final String NON_POSITIVE_MESSAGE = "Quantity is non-positive";
     private static final Object lock;
 
     private static CartService instance;
@@ -33,14 +32,14 @@ public class HttpSessionCartService implements CartService {
         lock = new Object();
     }
 
-    private HttpSessionCartService() {
+    private HttpSessionCartServiceImpl() {
         productDao = ArrayListProductDao.getInstance();
     }
 
     public static CartService getInstance() {
         if (Objects.isNull(instance)) {
             synchronized (lock) {
-                instance = new HttpSessionCartService();
+                instance = new HttpSessionCartServiceImpl();
             }
         }
         return instance;
@@ -62,19 +61,27 @@ public class HttpSessionCartService implements CartService {
     }
 
     @Override
-    public void addProduct(HttpServletRequest request, String productId, int quantity) throws IdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException {
-        validation(productId, quantity);
+    public void addProduct(HttpServletRequest request, String productId, int quantity)
+            throws IdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException {
+        checkingProductIdAndQuantity(productId, quantity);
         Product product = productDao.getProduct(productId);
-        if (product.getStock() < quantity) {
-            throw new OutOfStockException(product.getStock());
-        }
-        synchronized (request) {
-            List<CartItem> products = getCart(request).getProducts();
-            products.stream()
+        synchronized (request.getSession()) {
+            List<CartItem> cartItems = getCart(request).getCartItems();
+            Optional<CartItem> optionalCartItem = cartItems.stream()
                     .filter(cartItem -> cartItem.getProduct().equals(product))
-                    .findAny()
-                    .ifPresentOrElse(cartItem -> cartItem.setQuantity(cartItem.getQuantity() + quantity),
-                            () -> products.add(new CartItem(product, quantity)));
+                    .findAny();
+            if (optionalCartItem.isPresent()) {
+                CartItem cartItem = optionalCartItem.get();
+                if (product.getStock() < (quantity + cartItem.getQuantity())) {
+                    throw new OutOfStockException(product.getStock());
+                }
+                cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            } else {
+                if (product.getStock() < quantity) {
+                    throw new OutOfStockException(product.getStock());
+                }
+                cartItems.add(new CartItem(product, quantity));
+            }
         }
         recalculateCart(request);
     }
@@ -85,53 +92,62 @@ public class HttpSessionCartService implements CartService {
             throw new IdNotFoundException();
         }
         Product product = productDao.getProduct(productId);
-        synchronized (request) {
-            List<CartItem> products = getCart(request).getProducts();
-            products.removeIf(x -> x.getProduct().equals(product));
+        synchronized (request.getSession()) {
+            List<CartItem> cartItems = getCart(request).getCartItems();
+            cartItems.removeIf(cartItem -> cartItem.getProduct().equals(product));
         }
         recalculateCart(request);
     }
 
-    private void validation(String productId, int quantity) throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
+    private void checkingProductIdAndQuantity(String productId, int quantity)
+            throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
         if (StringUtils.isBlank(productId)) {
             throw new IdNotFoundException();
         }
         if (quantity <= NumberUtils.INTEGER_ZERO) {
-            throw new IllegalArgumentException(NON_POSITIVE_MESSAGE);
+            throw new IllegalArgumentException();
         }
     }
 
     @Override
-    public void removeProduct(HttpServletRequest request, String productId, int quantity) throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
-        validation(productId, quantity);
+    public void removeProduct(HttpServletRequest request, String productId, int quantity)
+            throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
+        checkingProductIdAndQuantity(productId, quantity);
         Product product = productDao.getProduct(productId);
-        synchronized (request) {
-            List<CartItem> products = getCart(request).getProducts();
-            Optional<CartItem> optionalCartItem = products.stream()
+        synchronized (request.getSession()) {
+            List<CartItem> cartItems = getCart(request).getCartItems();
+            Optional<CartItem> optionalCartItem = cartItems.stream()
                     .filter(cartItem -> cartItem.getProduct().equals(product))
                     .findAny();
             if (optionalCartItem.isPresent()) {
                 CartItem cartItem = optionalCartItem.get();
                 if (cartItem.getQuantity() < quantity) {
-                    throw new QuantityOfBoundException();
+                    throw new QuantityOutOfBoundException();
                 }
                 cartItem.setQuantity(cartItem.getQuantity() - quantity);
             } else {
                 throw new ProductNotFoundException();
             }
+            cartItems.removeIf(this::quantityComparing);
         }
         recalculateCart(request);
     }
 
+    private boolean quantityComparing(CartItem cartItem) {
+        if (Objects.isNull(cartItem)) {
+            return true;
+        }
+        return cartItem.getQuantity() <= 0;
+    }
+
     private void recalculateCart(HttpServletRequest request) {
         Cart cart = getCart(request);
-        List<CartItem> products = cart.getProducts();
-        cart.setTotalPrice(products.stream()
+        List<CartItem> cartItems = cart.getCartItems();
+        cart.setTotalPrice(cartItems.stream()
                 .map(cartItem -> cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
-        cart.setTotalQuantity(products.stream()
+        cart.setTotalQuantity(cartItems.stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum());
     }
-
 }

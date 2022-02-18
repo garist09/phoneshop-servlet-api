@@ -5,7 +5,7 @@ import com.es.phoneshop.dao.ProductDao;
 import com.es.phoneshop.exception.IdNotFoundException;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.RecentlyViewedProducts;
-import com.es.phoneshop.service.impl.HttpSessionRecentlyViewedProductsService;
+import com.es.phoneshop.service.impl.HttpSessionRecentlyViewedProductsServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -45,7 +45,7 @@ public class HttpSessionRecentlyViewedProductsServiceTest {
 
     @Before
     public void setup() {
-        httpSessionRecentlyViewedProductsService = HttpSessionRecentlyViewedProductsService.getInstance();
+        httpSessionRecentlyViewedProductsService = HttpSessionRecentlyViewedProductsServiceImpl.getInstance();
         productDao = ArrayListProductDao.getInstance();
         when(request.getSession()).thenReturn(session);
     }

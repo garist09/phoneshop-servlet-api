@@ -6,7 +6,7 @@ import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.cart.CartItem;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.service.CartService;
-import com.es.phoneshop.service.impl.HttpSessionCartService;
+import com.es.phoneshop.service.impl.HttpSessionCartServiceImpl;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import javax.servlet.ServletConfig;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
 
-public class HttpSessionCartServlet extends HttpServlet {
+public class CartPageServlet extends HttpServlet {
     public static final String CART_JSP = "/WEB-INF/pages/cart.jsp";
     public static final String CART_LIST = "cartList";
     public static final String TOTAL_PRICE = "totalPrice";
@@ -31,14 +31,14 @@ public class HttpSessionCartServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        cartService = HttpSessionCartService.getInstance();
+        cartService = HttpSessionCartServiceImpl.getInstance();
         productDao = ArrayListProductDao.getInstance();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Cart cart = cartService.getCart(request);
-        request.setAttribute(CART_LIST, cart.getProducts());
+        request.setAttribute(CART_LIST, cart.getCartItems());
         request.setAttribute(TOTAL_PRICE, cart.getTotalPrice());
         request.getRequestDispatcher(CART_JSP).forward(request, response);
     }
@@ -50,7 +50,7 @@ public class HttpSessionCartServlet extends HttpServlet {
         }
         if (Objects.nonNull(request.getParameter(ADD_PARAMETER))) {
             Product product = productDao.getProduct(request.getParameter(ADD_PARAMETER));
-            Optional<CartItem> optionalCartItem = cartService.getCart(request).getProducts().stream()
+            Optional<CartItem> optionalCartItem = cartService.getCart(request).getCartItems().stream()
                     .filter(cartItem -> cartItem.getProduct().equals(product))
                     .findAny();
             if (optionalCartItem.isPresent()) {

@@ -95,13 +95,13 @@ public class HttpSessionCartServiceImplTest {
     }
 
     @Test
-    public void addProductShouldAddProductToCartAndSetStockWhenAllParametersAreCorrect() {
+    public void addProductShouldAddProductToCartAndGetStockWhenAllParametersAreCorrect() {
         when(product.getId()).thenReturn(PRODUCT_ID);
         when(product.getStock()).thenReturn(POSITIVE_QUANTITY);
         productDao.save(product);
 
         httpSessionCartService.addProduct(request, PRODUCT_ID, POSITIVE_QUANTITY);
 
-        verify(product).setStock(anyInt());
+        verify(product, times(1)).getStock();
     }
 }

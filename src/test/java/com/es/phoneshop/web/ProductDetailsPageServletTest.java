@@ -15,6 +15,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Currency;
@@ -33,6 +34,7 @@ public class ProductDetailsPageServletTest {
     public static final int INT10 = 10;
     public static final String GALAXY_20_S_20_II_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg";
     public static final String STRING = "/";
+    public static final String NOT_EXIST_PRODUCT_ID = "id";
 
     private ProductDetailsPageServlet productDetailsPageServlet;
     private ProductDao productDao;
@@ -50,6 +52,9 @@ public class ProductDetailsPageServletTest {
     @Mock
     private RequestDispatcher requestDispatcher;
 
+    @Mock
+    private HttpSession session;
+
     @Before
     public void init() throws ServletException {
         productDao = ArrayListProductDao.getInstance();
@@ -57,6 +62,7 @@ public class ProductDetailsPageServletTest {
         productDetailsPageServlet = new ProductDetailsPageServlet();
         productDetailsPageServlet.init(config);
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);
+        when(request.getSession()).thenReturn(session);
     }
 
     @Test
@@ -73,9 +79,8 @@ public class ProductDetailsPageServletTest {
     @Test(expected = ProductNotFoundException.class)
     public void doGetShouldThrowProductNotFoundExceptionWhenIdIsNotFound() throws ServletException, IOException {
         productDao.save(product);
-        when(request.getPathInfo()).thenReturn(STRING);
+        when(request.getPathInfo()).thenReturn(STRING + NOT_EXIST_PRODUCT_ID);
 
         productDetailsPageServlet.doGet(request, response);
     }
-
 }

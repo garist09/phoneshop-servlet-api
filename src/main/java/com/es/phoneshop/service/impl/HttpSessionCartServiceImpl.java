@@ -133,6 +133,12 @@ public class HttpSessionCartServiceImpl implements CartService {
         recalculateCart(request);
     }
 
+    @Override
+    public void clearCart(HttpServletRequest request) {
+        getCart(request).getCartItems().clear();
+        recalculateCart(request);
+    }
+
     private boolean isQuantityValid(CartItem cartItem) {
         if (Objects.isNull(cartItem)) {
             return true;

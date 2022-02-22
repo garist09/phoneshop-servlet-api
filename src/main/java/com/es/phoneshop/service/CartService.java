@@ -12,4 +12,5 @@ public interface CartService {
     void addProduct(HttpServletRequest request, String productId, int quantity) throws IdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException;
     void deleteProduct(HttpServletRequest request, String productId);
     void removeProduct(HttpServletRequest request, String productId, int quantity);
+    void clearCart(HttpServletRequest request);
 }

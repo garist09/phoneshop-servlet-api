@@ -58,6 +58,7 @@ img.cart {
 }
 .inline {
     display: inline;
+    border: 0;
 }
 
 .plus-icon{
@@ -99,4 +100,12 @@ img.cart {
 .green{
     color: green;
     font-size: 18px;
+}
+.text-body-left{
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+}
+span.required{
+    color: red;
 }

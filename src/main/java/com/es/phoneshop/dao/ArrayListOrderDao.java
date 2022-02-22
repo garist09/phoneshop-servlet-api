@@ -12,15 +12,24 @@ import java.util.List;
 import java.util.Objects;
 
 public class ArrayListOrderDao implements OrderDao {
+    private static final Object lock;
+    public static final String ORDER_LIST_ATTRIBUTE = "orderList";
+
     private static List<Order> orderList;
     private static OrderDao instance;
+
+    static {
+        lock = new Object();
+    }
 
     private ArrayListOrderDao() {
     }
 
     public static OrderDao getInstance() {
         if (Objects.isNull(instance)) {
-            instance = new ArrayListOrderDao();
+            synchronized (lock) {
+                instance = new ArrayListOrderDao();
+            }
         }
         return instance;
     }
@@ -28,13 +37,13 @@ public class ArrayListOrderDao implements OrderDao {
     @Override
     public List<Order> getOrderList(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        if (Objects.isNull(session.getAttribute("orderList"))) {
+        if (Objects.isNull(session.getAttribute(ORDER_LIST_ATTRIBUTE))) {
             synchronized (session) {
                 orderList = new ArrayList<>();
             }
-            session.setAttribute("orderList", orderList);
+            session.setAttribute(ORDER_LIST_ATTRIBUTE, orderList);
         } else {
-            orderList = (List) session.getAttribute("orderList");
+            orderList = (List) session.getAttribute(ORDER_LIST_ATTRIBUTE);
         }
         return orderList;
     }
@@ -56,7 +65,9 @@ public class ArrayListOrderDao implements OrderDao {
         if (Objects.isNull(order)) {
             throw new OrderNotFoundException();
         }
-        getOrderList(request).add(order);
+        synchronized (request.getSession()) {
+            getOrderList(request).add(order);
+        }
     }
 
     @Override
@@ -64,6 +75,8 @@ public class ArrayListOrderDao implements OrderDao {
         if (StringUtils.isBlank(orderId)) {
             throw new IdNotFoundException();
         }
-        getOrderList(request).remove(getOrder(request, orderId));
+        synchronized (request.getSession()) {
+            getOrderList(request).remove(getOrder(request, orderId));
+        }
     }
 }

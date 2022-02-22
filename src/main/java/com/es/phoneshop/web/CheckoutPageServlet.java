@@ -48,6 +48,7 @@ public class CheckoutPageServlet extends HttpServlet {
     public static final String PAYMENT_METHOD_PARAMETER = "paymentMethod";
     public static final String ORDER_OVERVIEW_SERVLET_PATH = "/products/cart/order/overview";
     public static final String ORDER_LIST_ATTRIBUTE = "orderList";
+    public static final String FORMAT_DATE = "E dd.MM.yyyy";
 
     private static String[] deliveryDates;
 
@@ -60,7 +61,7 @@ public class CheckoutPageServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        SimpleDateFormat formatDateNow = new SimpleDateFormat("E dd.MM.yyyy");
+        SimpleDateFormat formatDateNow = new SimpleDateFormat(FORMAT_DATE);
         Date date = new Date(new Date().getTime() + TimeUnit.DAYS.toMillis(3));
         String firstDeliveryDate = formatDateNow.format(date);
         date.setTime(date.getTime() + TimeUnit.DAYS.toMillis(1));
@@ -88,6 +89,8 @@ public class CheckoutPageServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Cart cart = cartService.getCart(request);
+        order = orderService.createOrderFromCart(cart);
         List<String> errors = new ArrayList<>();
         setErrors(request, errors);
         request.setAttribute(ERRORS_ATTRIBUTE, errors);
@@ -130,5 +133,4 @@ public class CheckoutPageServlet extends HttpServlet {
     private String getParameterWithUTF8Encoding(HttpServletRequest request, String parameter) {
         return new String (request.getParameter(parameter).getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
     }
-
 }

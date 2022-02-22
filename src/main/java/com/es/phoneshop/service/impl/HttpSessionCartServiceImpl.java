@@ -63,7 +63,7 @@ public class HttpSessionCartServiceImpl implements CartService {
     @Override
     public void addProduct(HttpServletRequest request, String productId, int quantity)
             throws IdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException {
-        checkingProductIdAndQuantity(productId, quantity);
+        checkProductIdAndQuantity(productId, quantity);
         Product product = productDao.getProduct(productId);
         synchronized (request.getSession()) {
             List<CartItem> cartItems = getCart(request).getCartItems();
@@ -99,7 +99,7 @@ public class HttpSessionCartServiceImpl implements CartService {
         recalculateCart(request);
     }
 
-    private void checkingProductIdAndQuantity(String productId, int quantity)
+    private void checkProductIdAndQuantity(String productId, int quantity)
             throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
         if (StringUtils.isBlank(productId)) {
             throw new IdNotFoundException();
@@ -112,7 +112,7 @@ public class HttpSessionCartServiceImpl implements CartService {
     @Override
     public void removeProduct(HttpServletRequest request, String productId, int quantity)
             throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
-        checkingProductIdAndQuantity(productId, quantity);
+        checkProductIdAndQuantity(productId, quantity);
         Product product = productDao.getProduct(productId);
         synchronized (request.getSession()) {
             List<CartItem> cartItems = getCart(request).getCartItems();
@@ -128,12 +128,18 @@ public class HttpSessionCartServiceImpl implements CartService {
             } else {
                 throw new ProductNotFoundException();
             }
-            cartItems.removeIf(this::quantityComparing);
+            cartItems.removeIf(this::isQuantityValid);
         }
         recalculateCart(request);
     }
 
-    private boolean quantityComparing(CartItem cartItem) {
+    @Override
+    public void clearCart(HttpServletRequest request) {
+        getCart(request).getCartItems().clear();
+        recalculateCart(request);
+    }
+
+    private boolean isQuantityValid(CartItem cartItem) {
         if (Objects.isNull(cartItem)) {
             return true;
         }

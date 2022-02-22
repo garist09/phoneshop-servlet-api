@@ -83,6 +83,11 @@
                 <td></td>
             </tr>
         </table>
+        <p>
+        <form method="get" action="${pageContext.request.contextPath}/products/cart/checkout">
+            <button name="order" type="submit">Place an order</button>
+        </form>
+        </p>
     </c:if>
     <c:if test="${empty cartList}">
         <div class="text-header">

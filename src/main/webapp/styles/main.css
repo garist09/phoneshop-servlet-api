@@ -78,7 +78,14 @@ img.cart {
     border:none;
     background-color: white;
 }
-
+.delete-order-icon{
+    background-image: url('../images/remove.png');
+    background-size: 15px;
+    height: 15px;
+    width: 15px;
+    border:none;
+    background-color: white;
+}
 .text-body{
     font-size: 20px;
     font-weight: bold;
@@ -109,6 +116,11 @@ img.cart {
     font-size: 20px;
     font-weight: bold;
     text-align: left;
+}
+img.order{
+    display: inline-block;
+    margin: 21px 21px 0 0;
+    max-width: 42px;
 }
 span{
     color: red;

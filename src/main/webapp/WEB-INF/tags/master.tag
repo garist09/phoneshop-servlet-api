@@ -18,6 +18,9 @@
       <a href="${pageContext.servletContext.contextPath}/products/cart">
         <img src="${pageContext.servletContext.contextPath}/images/cart.png" class="cart" align="right"/>
       </a>
+    <a href="${pageContext.servletContext.contextPath}/products/cart/order/overview">
+      <img src="${pageContext.servletContext.contextPath}/images/checklist.png" class="order" align="right"/>
+    </a>
   </header>
   <main>
     <jsp:doBody/>

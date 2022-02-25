@@ -2,7 +2,7 @@ package com.es.phoneshop.service.impl;
 
 import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.ProductIdNotFoundException;
 import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.exception.ProductNotFoundException;
 import com.es.phoneshop.exception.QuantityOutOfBoundException;
@@ -21,15 +21,15 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class HttpSessionCartServiceImpl implements CartService {
-    public static final String CART_ATTRIBUTE = "sessionCart";
-    private static final Object lock;
+    private static final String CART_ATTRIBUTE = "sessionCart";
+    private static final Object LOCK;
 
     private static CartService instance;
 
     private ProductDao productDao;
 
     static {
-        lock = new Object();
+        LOCK = new Object();
     }
 
     private HttpSessionCartServiceImpl() {
@@ -38,7 +38,7 @@ public class HttpSessionCartServiceImpl implements CartService {
 
     public static CartService getInstance() {
         if (Objects.isNull(instance)) {
-            synchronized (lock) {
+            synchronized (LOCK) {
                 instance = new HttpSessionCartServiceImpl();
             }
         }
@@ -62,14 +62,16 @@ public class HttpSessionCartServiceImpl implements CartService {
 
     @Override
     public void addProduct(HttpServletRequest request, String productId, int quantity)
-            throws IdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException {
+            throws ProductIdNotFoundException, OutOfStockException, ProductNotFoundException, IllegalArgumentException {
         checkProductIdAndQuantity(productId, quantity);
         Product product = productDao.getProduct(productId);
+
         synchronized (request.getSession()) {
             List<CartItem> cartItems = getCart(request).getCartItems();
             Optional<CartItem> optionalCartItem = cartItems.stream()
                     .filter(cartItem -> cartItem.getProduct().equals(product))
                     .findAny();
+
             if (optionalCartItem.isPresent()) {
                 CartItem cartItem = optionalCartItem.get();
                 if (product.getStock() < (quantity + cartItem.getQuantity())) {
@@ -83,26 +85,29 @@ public class HttpSessionCartServiceImpl implements CartService {
                 cartItems.add(new CartItem(product, quantity));
             }
         }
+
         recalculateCart(request);
     }
 
     @Override
-    public void deleteProduct(HttpServletRequest request, String productId) throws IdNotFoundException {
+    public void deleteProduct(HttpServletRequest request, String productId) throws ProductIdNotFoundException {
         if (StringUtils.isBlank(productId)) {
-            throw new IdNotFoundException();
+            throw new ProductIdNotFoundException();
         }
         Product product = productDao.getProduct(productId);
+
         synchronized (request.getSession()) {
             List<CartItem> cartItems = getCart(request).getCartItems();
             cartItems.removeIf(cartItem -> cartItem.getProduct().equals(product));
         }
+
         recalculateCart(request);
     }
 
     private void checkProductIdAndQuantity(String productId, int quantity)
-            throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
+            throws ProductIdNotFoundException, IllegalArgumentException, OutOfStockException {
         if (StringUtils.isBlank(productId)) {
-            throw new IdNotFoundException();
+            throw new ProductIdNotFoundException();
         }
         if (quantity <= NumberUtils.INTEGER_ZERO) {
             throw new IllegalArgumentException();
@@ -111,14 +116,16 @@ public class HttpSessionCartServiceImpl implements CartService {
 
     @Override
     public void removeProduct(HttpServletRequest request, String productId, int quantity)
-            throws IdNotFoundException, IllegalArgumentException, OutOfStockException {
+            throws ProductIdNotFoundException, IllegalArgumentException, OutOfStockException {
         checkProductIdAndQuantity(productId, quantity);
         Product product = productDao.getProduct(productId);
+
         synchronized (request.getSession()) {
             List<CartItem> cartItems = getCart(request).getCartItems();
             Optional<CartItem> optionalCartItem = cartItems.stream()
                     .filter(cartItem -> cartItem.getProduct().equals(product))
                     .findAny();
+
             if (optionalCartItem.isPresent()) {
                 CartItem cartItem = optionalCartItem.get();
                 if (cartItem.getQuantity() < quantity) {
@@ -130,6 +137,7 @@ public class HttpSessionCartServiceImpl implements CartService {
             }
             cartItems.removeIf(this::isQuantityValid);
         }
+
         recalculateCart(request);
     }
 
@@ -152,6 +160,7 @@ public class HttpSessionCartServiceImpl implements CartService {
         cart.setTotalPrice(cartItems.stream()
                 .map(cartItem -> cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add));
+
         cart.setTotalQuantity(cartItems.stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum());

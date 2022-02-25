@@ -2,7 +2,7 @@ package com.es.phoneshop.service;
 
 import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.ProductIdNotFoundException;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.RecentlyViewedProducts;
 import com.es.phoneshop.service.impl.HttpSessionRecentlyViewedProductsServiceImpl;
@@ -28,8 +28,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpSessionRecentlyViewedProductsServiceTest {
-    public static final int NUMBER_OF_INVOCATIONS = 2;
-    public static final String PRODUCT_ID = "3";
+    private static final int NUMBER_OF_INVOCATIONS = 2;
+    private static final String PRODUCT_ID = "3";
 
     private RecentlyViewedProductsService httpSessionRecentlyViewedProductsService;
     private ProductDao productDao;
@@ -54,7 +54,8 @@ public class HttpSessionRecentlyViewedProductsServiceTest {
     public void getRecentlyViewedProductsShouldSetAttributeWhenAttributeIsNull() {
         when(session.getAttribute(anyString())).thenReturn(null);
 
-        RecentlyViewedProducts recentlyViewedProducts = httpSessionRecentlyViewedProductsService.getRecentlyViewedProducts(request);
+        RecentlyViewedProducts recentlyViewedProducts = httpSessionRecentlyViewedProductsService
+                .getRecentlyViewedProducts(request);
 
         verify(session).getAttribute(anyString());
         verify(session).setAttribute(anyString(), any());
@@ -66,14 +67,15 @@ public class HttpSessionRecentlyViewedProductsServiceTest {
         RecentlyViewedProducts recentlyViewedProducts = new RecentlyViewedProducts();
         when(session.getAttribute(anyString())).thenReturn(recentlyViewedProducts);
 
-        RecentlyViewedProducts resultRecentlyViewedProducts = httpSessionRecentlyViewedProductsService.getRecentlyViewedProducts(request);
+        RecentlyViewedProducts resultRecentlyViewedProducts = httpSessionRecentlyViewedProductsService
+                .getRecentlyViewedProducts(request);
 
         verify(session, times(NUMBER_OF_INVOCATIONS)).getAttribute(anyString());
         assertNotNull(resultRecentlyViewedProducts);
         assertEquals(recentlyViewedProducts, resultRecentlyViewedProducts);
     }
 
-    @Test(expected = IdNotFoundException.class)
+    @Test(expected = ProductIdNotFoundException.class)
     public void addProductShouldThrowIdNotFoundExceptionWhenProductIdIsNull() {
         httpSessionRecentlyViewedProductsService.addProduct(request, null);
     }
@@ -87,7 +89,8 @@ public class HttpSessionRecentlyViewedProductsServiceTest {
 
         httpSessionRecentlyViewedProductsService.addProduct(request, PRODUCT_ID);
 
-        List<Product> productList = httpSessionRecentlyViewedProductsService.getRecentlyViewedProducts(request).getProducts();
+        List<Product> productList = httpSessionRecentlyViewedProductsService
+                .getRecentlyViewedProducts(request).getProducts();
         assertTrue(productList.contains(product));
     }
 }

@@ -19,11 +19,11 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class CartPageServlet extends HttpServlet {
-    public static final String CART_JSP = "/WEB-INF/pages/cart.jsp";
-    public static final String CART_LIST = "cartList";
-    public static final String TOTAL_PRICE = "totalPrice";
-    public static final String REMOVE_PARAMETER = "remove";
-    public static final String ADD_PARAMETER = "add";
+    private static final String CART_JSP = "/WEB-INF/pages/cart.jsp";
+    private static final String CART_LIST = "cartList";
+    private static final String TOTAL_PRICE = "totalPrice";
+    private static final String REMOVE_PARAMETER = "remove";
+    private static final String ADD_PARAMETER = "add";
 
     private CartService cartService;
     private ProductDao productDao;
@@ -40,6 +40,7 @@ public class CartPageServlet extends HttpServlet {
         Cart cart = cartService.getCart(request);
         request.setAttribute(CART_LIST, cart.getCartItems());
         request.setAttribute(TOTAL_PRICE, cart.getTotalPrice());
+
         request.getRequestDispatcher(CART_JSP).forward(request, response);
     }
 
@@ -53,6 +54,7 @@ public class CartPageServlet extends HttpServlet {
             Optional<CartItem> optionalCartItem = cartService.getCart(request).getCartItems().stream()
                     .filter(cartItem -> cartItem.getProduct().equals(product))
                     .findAny();
+
             if (optionalCartItem.isPresent()) {
                 CartItem cartItem = optionalCartItem.get();
                 if (cartItem.getQuantity() < product.getStock()) {
@@ -60,6 +62,7 @@ public class CartPageServlet extends HttpServlet {
                 }
             }
         }
+
         doGet(request, response);
     }
 }

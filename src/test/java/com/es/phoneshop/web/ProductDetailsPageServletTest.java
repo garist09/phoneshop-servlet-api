@@ -26,15 +26,16 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductDetailsPageServletTest {
-    public static final String PRODUCT = "product";
-    public static final String SGS_2 = "sgs2";
-    public static final String SAMSUNG_GALAXY_S_II = "Samsung Galaxy S II";
-    public static final int INT200 = 200;
-    public static final Currency USD = Currency.getInstance("USD");
-    public static final int INT10 = 10;
-    public static final String GALAXY_20_S_20_II_JPG = "https://raw.githubusercontent.com/andrewosipenko/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg";
-    public static final String STRING = "/";
-    public static final String NOT_EXIST_PRODUCT_ID = "id";
+    private static final String PRODUCT = "product";
+    private static final String SGS_2 = "sgs2";
+    private static final String SAMSUNG_GALAXY_S_II = "Samsung Galaxy S II";
+    private static final int INT200 = 200;
+    private static final Currency USD = Currency.getInstance("USD");
+    private static final int INT10 = 10;
+    private static final String GALAXY_20_S_20_II_JPG = "https://raw.githubusercontent.com/andrewosipenko" +
+            "/phoneshop-ext-images/master/manufacturer/Samsung/Samsung%20Galaxy%20S%20II.jpg";
+    private static final String STRING = "/";
+    private static final String NOT_EXIST_PRODUCT_ID = "id";
 
     private ProductDetailsPageServlet productDetailsPageServlet;
     private ProductDao productDao;
@@ -58,7 +59,14 @@ public class ProductDetailsPageServletTest {
     @Before
     public void init() throws ServletException {
         productDao = ArrayListProductDao.getInstance();
-        product = new Product.Builder().withCode(SGS_2).withDescription(SAMSUNG_GALAXY_S_II).withPrice(new BigDecimal(INT200)).withCurrency(USD).withStock(INT10).withImageUrl(GALAXY_20_S_20_II_JPG).build();
+        product = new Product.Builder()
+                .withCode(SGS_2)
+                .withDescription(SAMSUNG_GALAXY_S_II)
+                .withPrice(new BigDecimal(INT200))
+                .withCurrency(USD)
+                .withStock(INT10)
+                .withImageUrl(GALAXY_20_S_20_II_JPG)
+                .build();
         productDetailsPageServlet = new ProductDetailsPageServlet();
         productDetailsPageServlet.init(config);
         when(request.getRequestDispatcher(anyString())).thenReturn(requestDispatcher);

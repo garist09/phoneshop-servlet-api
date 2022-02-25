@@ -1,6 +1,6 @@
 package com.es.phoneshop.dao;
 
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.OrderIdNotFoundException;
 import com.es.phoneshop.exception.OrderNotFoundException;
 import com.es.phoneshop.model.order.Order;
 import org.apache.commons.lang3.StringUtils;
@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Objects;
 
 public class ArrayListOrderDao implements OrderDao {
-    private static final Object lock;
-    public static final String ORDER_LIST_ATTRIBUTE = "orderList";
+    private static final Object LOCK;
+    private static final String ORDER_LIST_ATTRIBUTE = "orderList";
 
     private static List<Order> orderList;
     private static OrderDao instance;
 
     static {
-        lock = new Object();
+        LOCK = new Object();
     }
 
     private ArrayListOrderDao() {
@@ -27,7 +27,7 @@ public class ArrayListOrderDao implements OrderDao {
 
     public static OrderDao getInstance() {
         if (Objects.isNull(instance)) {
-            synchronized (lock) {
+            synchronized (LOCK) {
                 instance = new ArrayListOrderDao();
             }
         }
@@ -51,7 +51,7 @@ public class ArrayListOrderDao implements OrderDao {
     @Override
     public Order getOrder(HttpServletRequest request, String orderId) {
         if (StringUtils.isBlank(orderId)) {
-            throw new IdNotFoundException();
+            throw new OrderIdNotFoundException();
         }
         orderList = getOrderList(request);
         return orderList.stream()
@@ -73,7 +73,7 @@ public class ArrayListOrderDao implements OrderDao {
     @Override
     public void deleteOrder(HttpServletRequest request, String orderId) {
         if (StringUtils.isBlank(orderId)) {
-            throw new IdNotFoundException();
+            throw new OrderIdNotFoundException();
         }
         synchronized (request.getSession()) {
             getOrderList(request).remove(getOrder(request, orderId));

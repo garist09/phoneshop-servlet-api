@@ -30,11 +30,22 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CartPageServletTest {
-    public static final String PRODUCT_ID = "9";
-    public static final int PRODUCT_STOCK = 2;
-    public static final int PRODUCT_QUANTITY = 1;
-    public static final int WANTED_NUMBER_OF_INVOCATIONS_3 = 3;
-    public static final int WANTED_NUMBER_OF_INVOCATIONS_4 = 4;
+    private static final String PRODUCT_ID = "9";
+    private static final String CART_LIST = "cartList";
+    private static final String TOTAL_PRICE = "totalPrice";
+    private static final String REMOVE_PARAMETER = "remove";
+    private static final String ADD_PARAMETER = "add";
+    private static final String CART_ATTRIBUTE = "sessionCart";
+    private static final int PRODUCT_STOCK = 2;
+    private static final int PRODUCT_QUANTITY = 1;
+    private static final int WANTED_NUMBER_OF_INVOCATIONS_3 = 3;
+    private static final int WANTED_NUMBER_OF_INVOCATIONS_4 = 4;
+    private static final int PRODUCT_PRICE = 100;
+
+    private CartPageServlet servlet = new CartPageServlet();
+    private CartService cartService;
+    private ProductDao productDao;
+
     @Mock
     private HttpServletRequest request;
 
@@ -51,17 +62,7 @@ public class CartPageServletTest {
     private HttpSession session;
 
     @Mock
-    Product product;
-
-    private static final String CART_LIST = "cartList";
-    private static final String TOTAL_PRICE = "totalPrice";
-    public static final String REMOVE_PARAMETER = "remove";
-    public static final String ADD_PARAMETER = "add";
-    public static final String CART_ATTRIBUTE = "sessionCart";
-
-    private CartPageServlet servlet = new CartPageServlet();
-    private CartService cartService;
-    private ProductDao productDao;
+    private Product product;
 
     @Before
     public void setup() throws ServletException {
@@ -74,7 +75,7 @@ public class CartPageServletTest {
 
         when(product.getId()).thenReturn(PRODUCT_ID);
         when(product.getStock()).thenReturn(PRODUCT_STOCK);
-        when(product.getPrice()).thenReturn(new BigDecimal(100));
+        when(product.getPrice()).thenReturn(new BigDecimal(PRODUCT_PRICE));
     }
 
     @Test

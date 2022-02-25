@@ -1,6 +1,5 @@
 package com.es.phoneshop.dao;
 
-import com.es.phoneshop.model.cart.CartItem;
 import com.es.phoneshop.model.order.Order;
 
 import javax.servlet.http.HttpServletRequest;

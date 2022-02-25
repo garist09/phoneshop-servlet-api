@@ -4,13 +4,13 @@ import com.es.phoneshop.model.cart.CartItem;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 public class Order implements Serializable {
-    private static final Random random;
+    private static final SecureRandom secureRandom;
 
     private String id;
     private List<CartItem> cartItemList;
@@ -25,67 +25,56 @@ public class Order implements Serializable {
     private BigDecimal cartTotal;
 
     static {
-        random = new Random();
+        secureRandom = new SecureRandom();
     }
 
     public Order() {
         cartItemList = new ArrayList<>();
-        this.setId(new UUID(random.nextLong(),random.nextLong()).toString());
+        this.setId(new UUID(secureRandom.nextLong(), secureRandom.nextLong()).toString());
     }
 
-    public Order setId(String id) {
+    public void setId(String id) {
         this.id = id;
-        return this;
     }
 
-    public Order setCartItemList(List<CartItem> cartItemList) {
+    public void setCartItemList(List<CartItem> cartItemList) {
         this.cartItemList = cartItemList;
-        return this;
     }
 
-    public Order setFirstName(String firstName) {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
-        return this;
     }
 
-    public Order setLastName(String lastName) {
+    public void setLastName(String lastName) {
         this.lastName = lastName;
-        return this;
     }
 
-    public Order setPhoneNumber(String phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-        return this;
     }
 
-    public Order setDeliveryAddress(String deliveryAddress) {
+    public void setDeliveryAddress(String deliveryAddress) {
         this.deliveryAddress = deliveryAddress;
-        return this;
     }
 
-    public Order setDeliveryDate(String deliveryDate) {
+    public void setDeliveryDate(String deliveryDate) {
         this.deliveryDate = deliveryDate;
-        return this;
     }
 
-    public Order setPaymentMethod(String paymentMethod) {
+    public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
-        return this;
     }
 
-    public Order setSubtotal(BigDecimal subtotal) {
+    public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
-        return this;
     }
 
-    public Order setDeliveryCost(BigDecimal deliveryCost) {
+    public void setDeliveryCost(BigDecimal deliveryCost) {
         this.deliveryCost = deliveryCost;
-        return this;
     }
 
-    public Order setCartTotal(BigDecimal cartTotal) {
+    public void setCartTotal(BigDecimal cartTotal) {
         this.cartTotal = cartTotal;
-        return this;
     }
 
     public String getId() {

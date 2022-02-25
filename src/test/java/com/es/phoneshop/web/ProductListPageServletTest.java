@@ -21,6 +21,10 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ProductListPageServletTest {
+    private static final String attribute = "products";
+
+    private ProductListPageServlet servlet = new ProductListPageServlet();
+
     @Mock
     private HttpServletRequest request;
 
@@ -32,10 +36,6 @@ public class ProductListPageServletTest {
 
     @Mock
     private ServletConfig config;
-
-    private static final String attribute = "products";
-
-    private ProductListPageServlet servlet = new ProductListPageServlet();
 
     @Before
     public void setup() throws ServletException {

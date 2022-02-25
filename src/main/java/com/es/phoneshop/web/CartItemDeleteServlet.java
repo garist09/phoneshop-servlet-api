@@ -13,8 +13,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class CartItemDeleteServlet extends HttpServlet {
-    public static final String DELETE_PARAMETER = "delete";
-    public static final String CART_SERVLET = "/products/cart";
+    private static final String DELETE_PARAMETER = "delete";
+    private static final String CART_SERVLET = "/products/cart";
 
     private CartService cartService;
 
@@ -29,6 +29,7 @@ public class CartItemDeleteServlet extends HttpServlet {
         if (Objects.nonNull(request.getParameter(DELETE_PARAMETER))) {
             cartService.deleteProduct(request, request.getParameter(DELETE_PARAMETER));
         }
+
         response.sendRedirect(request.getContextPath() + CART_SERVLET);
     }
 }

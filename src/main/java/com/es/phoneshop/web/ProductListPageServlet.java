@@ -21,19 +21,21 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class ProductListPageServlet extends HttpServlet {
-    public static final String SORT = "sort";
-    public static final String ID_PARAMETER = "id";
+    private static final String SORT = "sort";
+    private static final String ID_PARAMETER = "id";
     private static final String attribute = "products";
     private static final String path = "/WEB-INF/pages/productList.jsp";
-    public static final String SEARCH_MOBILE = "searchMobile";
-    public static final String ORDER = "order";
-    public static final String QUANTITY_PARAMETER = "quantity";
-    public static final String ERROR_ATTRIBUTE = "error";
-    public static final String NOT_A_NUMBER_MESSAGE = "error.invalid.number.message";
-    public static final String AVAILABLE_MESSAGE = "error.out.of.stock.message";
-    public static final String NON_POSITIVE_QUANTITY = "error.not.positive.message";
-    public static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
-    public static final String SUCCESSFULLY_ADDED_TO_THE_CART = "The product has been successfully added to the cart";
+    private static final String SEARCH_MOBILE = "searchMobile";
+    private static final String ORDER = "order";
+    private static final String QUANTITY_PARAMETER = "quantity";
+    private static final String ERROR_ATTRIBUTE = "error";
+    private static final String NOT_A_NUMBER_MESSAGE = "error.invalid.number.message";
+    private static final String AVAILABLE_MESSAGE = "error.out.of.stock.message";
+    private static final String NON_POSITIVE_QUANTITY = "error.not.positive.message";
+    private static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
+    private static final String SUCCESSFULLY_ADDED_TO_THE_CART = "The product has been successfully added to the cart";
+    private static final String PARSE_EXCEPTION_MESSAGE = "The string contains invalid characters";
+    private static final int CHARACTER_OUTSIDE_STRING = -1;
 
     private ProductDao productDao;
     private CartService cartService;
@@ -52,6 +54,7 @@ public class ProductListPageServlet extends HttpServlet {
         String query = request.getParameter(SEARCH_MOBILE);
         String sortField = request.getParameter(SORT);
         String sortOrder = request.getParameter(ORDER);
+
         try {
             request.setAttribute(attribute, productDao.findProducts(query,
                     Optional.ofNullable(sortField).map(field -> SortField.valueOf(field)).orElse(null),
@@ -59,6 +62,7 @@ public class ProductListPageServlet extends HttpServlet {
         } catch (ProductNotFoundException e) {
             System.out.println(e.getMessage());
         }
+
         request.getRequestDispatcher(path).forward(request, response);
     }
 
@@ -70,6 +74,9 @@ public class ProductListPageServlet extends HttpServlet {
         NumberFormat format = NumberFormat.getInstance(request.getLocale());
 
         try {
+            if (!stringQuantity.matches("([1-9][0-9]*(,0+)?)")) {
+                throw new ParseException(PARSE_EXCEPTION_MESSAGE, CHARACTER_OUTSIDE_STRING);
+            }
             quantity = format.parse(stringQuantity).intValue();
             cartService.addProduct(request, id, quantity);
             request.setAttribute(SUCCESS_MESSAGE_ATTRIBUTE, SUCCESSFULLY_ADDED_TO_THE_CART);

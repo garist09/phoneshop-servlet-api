@@ -2,7 +2,7 @@ package com.es.phoneshop.web;
 
 import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.ProductIdNotFoundException;
 import com.es.phoneshop.exception.ProductNotFoundException;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.service.CartService;
@@ -28,9 +28,14 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CartItemDeleteServletTest {
-    public static final String PRODUCT_ID = "9";
-    public static final int PRODUCT_STOCK = 1;
-    public static final int WANTED_NUMBER_OF_INVOCATIONS = 2;
+    private static final String PRODUCT_ID = "9";
+    private static final int PRODUCT_STOCK = 1;
+    private static final int WANTED_NUMBER_OF_INVOCATIONS = 2;
+
+    private CartItemDeleteServlet servlet = new CartItemDeleteServlet();
+    private CartService cartService;
+    private ProductDao productDao;
+
     @Mock
     private HttpServletRequest request;
 
@@ -45,10 +50,6 @@ public class CartItemDeleteServletTest {
 
     @Mock
     private HttpSession session;
-
-    private CartItemDeleteServlet servlet = new CartItemDeleteServlet();
-    private CartService cartService;
-    private ProductDao productDao;
 
     @Before
     public void setup() throws ServletException {
@@ -79,7 +80,7 @@ public class CartItemDeleteServletTest {
         servlet.doPost(request, response);
     }
 
-    @Test(expected = IdNotFoundException.class)
+    @Test(expected = ProductIdNotFoundException.class)
     public void doPostShouldThrowIdNotFoundExceptionWhenIdIsIncorrect() throws IOException {
         when(request.getParameter(anyString())).thenReturn(StringUtils.EMPTY);
 

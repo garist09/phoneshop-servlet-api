@@ -1,6 +1,6 @@
 package com.es.phoneshop.dao;
 
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.ProductIdNotFoundException;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.exception.ProductNotFoundException;
 import com.es.phoneshop.model.sortenum.SortField;
@@ -31,14 +31,19 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public synchronized Product getProduct(String productId) throws ProductNotFoundException, IdNotFoundException {
+    public synchronized Product getProduct(String productId) throws ProductNotFoundException, ProductIdNotFoundException {
         if (StringUtils.isBlank(productId)) {
-            throw new IdNotFoundException();
+            throw new ProductIdNotFoundException();
         }
         return products.stream()
                 .filter(product -> Objects.equals(productId, product.getId()))
                 .findAny()
                 .orElseThrow(ProductNotFoundException::new);
+    }
+
+    @Override
+    public synchronized void deleteAllProducts() {
+        products.clear();
     }
 
     @Override
@@ -61,7 +66,8 @@ public class ArrayListProductDao implements ProductDao {
         if (!StringUtils.isBlank(query)) {
             String[] words = query.split(StringUtils.SPACE);
             comparator = comparator.thenComparing(Product::getDescription, (firstDescription, secondDescription) ->
-                    Integer.compare(firstDescription.split(StringUtils.SPACE).length, secondDescription.split(StringUtils.SPACE).length));
+                    Integer.compare(firstDescription.split(StringUtils.SPACE).length,
+                            secondDescription.split(StringUtils.SPACE).length));
             stream = stream
                     .filter(product -> Arrays.stream(words).allMatch(word -> product.getDescription().contains(word)));
         }
@@ -92,9 +98,9 @@ public class ArrayListProductDao implements ProductDao {
     }
 
     @Override
-    public synchronized void delete(String productId) throws ProductNotFoundException, IdNotFoundException {
+    public synchronized void delete(String productId) throws ProductNotFoundException, ProductIdNotFoundException {
         if (StringUtils.isBlank(productId)) {
-            throw new IdNotFoundException();
+            throw new ProductIdNotFoundException();
         }
         int size = products.size();
         products = products.stream()

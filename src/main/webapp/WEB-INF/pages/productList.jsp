@@ -15,6 +15,11 @@
         ${error}
     </p>
   </c:if>
+  <c:if test="${not empty successMessage}">
+    <p class="green">
+        ${successMessage}
+    </p>
+  </c:if>
   <table>
     <thead>
     <tr>

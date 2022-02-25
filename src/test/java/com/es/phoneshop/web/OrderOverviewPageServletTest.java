@@ -2,7 +2,7 @@ package com.es.phoneshop.web;
 
 import com.es.phoneshop.dao.ArrayListOrderDao;
 import com.es.phoneshop.dao.OrderDao;
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.OrderIdNotFoundException;
 import com.es.phoneshop.exception.OrderNotFoundException;
 import com.es.phoneshop.model.order.Order;
 import org.junit.Before;
@@ -26,7 +26,11 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrderOverviewPageServletTest {
-    public static final String CORRECT_ORDER_ID = "3";
+    private static final String CORRECT_ORDER_ID = "3";
+
+    private OrderOverviewPageServlet servlet = new OrderOverviewPageServlet();
+    private OrderDao orderDao = ArrayListOrderDao.getInstance();
+
     @Mock
     private HttpServletRequest request;
 
@@ -44,9 +48,6 @@ public class OrderOverviewPageServletTest {
 
     @Mock
     private Order order;
-
-    private OrderOverviewPageServlet servlet = new OrderOverviewPageServlet();
-    private OrderDao orderDao = ArrayListOrderDao.getInstance();
 
     @Before
     public void setup() throws ServletException {
@@ -71,7 +72,7 @@ public class OrderOverviewPageServletTest {
         verify(requestDispatcher).forward(request, response);
     }
 
-    @Test(expected = IdNotFoundException.class)
+    @Test(expected = OrderIdNotFoundException.class)
     public void doGetShouldThrowIdNotFoundExceptionWhenIdIsNotFound() throws ServletException, IOException {
         when(request.getParameter(any())).thenReturn(null);
 

@@ -2,7 +2,7 @@ package com.es.phoneshop.service.impl;
 
 import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.ProductIdNotFoundException;
 import com.es.phoneshop.exception.ProductNotFoundException;
 import com.es.phoneshop.model.product.Product;
 import com.es.phoneshop.model.product.RecentlyViewedProducts;
@@ -16,15 +16,15 @@ import java.util.List;
 import java.util.Objects;
 
 public class HttpSessionRecentlyViewedProductsServiceImpl implements RecentlyViewedProductsService {
-    public static final String RECENTLY_VIEWED = "recentlyViewed";
+    private static final String RECENTLY_VIEWED = "recentlyViewed";
+    private static final Object LOCK;
 
     private static HttpSessionRecentlyViewedProductsServiceImpl instance;
-    private static final Object lock;
 
     private ProductDao productDao;
 
     static {
-        lock = new Object();
+        LOCK = new Object();
     }
 
     private HttpSessionRecentlyViewedProductsServiceImpl() {
@@ -33,7 +33,7 @@ public class HttpSessionRecentlyViewedProductsServiceImpl implements RecentlyVie
 
     public static HttpSessionRecentlyViewedProductsServiceImpl getInstance() {
         if (Objects.isNull(instance)) {
-            synchronized (lock) {
+            synchronized (LOCK) {
                 instance = new HttpSessionRecentlyViewedProductsServiceImpl();
             }
         }
@@ -57,12 +57,13 @@ public class HttpSessionRecentlyViewedProductsServiceImpl implements RecentlyVie
 
     @Override
     public void addProduct(HttpServletRequest request, String productId)
-            throws ProductNotFoundException, IdNotFoundException {
+            throws ProductNotFoundException, ProductIdNotFoundException {
         if (StringUtils.isBlank(productId)) {
-            throw new IdNotFoundException();
+            throw new ProductIdNotFoundException();
         }
         List<Product> productList = getRecentlyViewedProducts(request).getProducts();
         Product product = productDao.getProduct(productId);
+
         if (!productList.contains(product)) {
             synchronized (request.getSession()) {
                 if (productList.size() > NumberUtils.INTEGER_TWO) {

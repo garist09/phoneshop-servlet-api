@@ -12,9 +12,9 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class OrderOverviewPageServlet extends HttpServlet {
-    public static final String ORDER_IS_PLACED_JSP = "/WEB-INF/pages/orderIsPlaced.jsp";
-    public static final String DELETE_ORDER_ID_PARAMETER = "deleteOrderId";
-    public static final String UPDATE_PARAMETER = "update";
+    private static final String ORDER_IS_PLACED_JSP = "/WEB-INF/pages/orderIsPlaced.jsp";
+    private static final String DELETE_ORDER_ID_PARAMETER = "deleteOrderId";
+    private static final String UPDATE_PARAMETER = "update";
 
     private OrderDao orderDao;
 
@@ -37,6 +37,7 @@ public class OrderOverviewPageServlet extends HttpServlet {
             return;
         }
         orderDao.deleteOrder(request, orderId);
+
         doGet(request, response);
     }
 }

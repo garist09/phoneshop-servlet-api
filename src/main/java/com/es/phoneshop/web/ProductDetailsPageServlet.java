@@ -20,15 +20,15 @@ import java.util.ResourceBundle;
 
 public class ProductDetailsPageServlet extends HttpServlet {
     private static final String PRODUCT_JSP_PAGE = "/WEB-INF/pages/product.jsp";
-    public static final String PRODUCT_ATTRIBUTE = "product";
-    public static final int BEGIN_INDEX = 1;
-    public static final String QUANTITY_PARAMETER = "quantity";
-    public static final String ERROR_ATTRIBUTE = "error";
-    public static final String NOT_A_NUMBER_MESSAGE = "error.invalid.number.message";
-    public static final String AVAILABLE_MESSAGE = "error.out.of.stock.message";
-    public static final String NON_POSITIVE_QUANTITY = "error.not.positive.message";
-    public static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
-    public static final String SUCCESSFULLY_ADDED_TO_THE_CART = "The product has been successfully added to the cart";
+    private static final String PRODUCT_ATTRIBUTE = "product";
+    private static final String QUANTITY_PARAMETER = "quantity";
+    private static final String ERROR_ATTRIBUTE = "error";
+    private static final String NOT_A_NUMBER_MESSAGE = "error.invalid.number.message";
+    private static final String AVAILABLE_MESSAGE = "error.out.of.stock.message";
+    private static final String NON_POSITIVE_QUANTITY = "error.not.positive.message";
+    private static final String SUCCESS_MESSAGE_ATTRIBUTE = "successMessage";
+    private static final String SUCCESSFULLY_ADDED_TO_THE_CART = "The product has been successfully added to the cart";
+    private static final int BEGIN_INDEX = 1;
 
     private ResourceBundle errorMessages;
     private ProductDao productDao;
@@ -49,6 +49,7 @@ public class ProductDetailsPageServlet extends HttpServlet {
         String id = request.getPathInfo().substring(BEGIN_INDEX);
         request.setAttribute(PRODUCT_ATTRIBUTE, productDao.getProduct(id));
         recentlyViewedProducts.addProduct(request, id);
+
         request.getRequestDispatcher(PRODUCT_JSP_PAGE).forward(request, response);
     }
 

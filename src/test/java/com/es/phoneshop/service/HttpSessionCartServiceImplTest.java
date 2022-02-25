@@ -2,7 +2,7 @@ package com.es.phoneshop.service;
 
 import com.es.phoneshop.dao.ArrayListProductDao;
 import com.es.phoneshop.dao.ProductDao;
-import com.es.phoneshop.exception.IdNotFoundException;
+import com.es.phoneshop.exception.ProductIdNotFoundException;
 import com.es.phoneshop.exception.OutOfStockException;
 import com.es.phoneshop.model.cart.Cart;
 import com.es.phoneshop.model.product.Product;
@@ -19,7 +19,6 @@ import javax.servlet.http.HttpSession;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -27,11 +26,11 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpSessionCartServiceImplTest {
-    public static final int NUMBER_OF_INVOCATIONS = 2;
-    public static final int POSITIVE_QUANTITY = 3;
-    public static final int ZERO_QUANTITY = 0;
-    public static final int NEGATIVE_QUANTITY = -3;
-    public static final String PRODUCT_ID = "3";
+    private static final int NUMBER_OF_INVOCATIONS = 2;
+    private static final int POSITIVE_QUANTITY = 3;
+    private static final int ZERO_QUANTITY = 0;
+    private static final int NEGATIVE_QUANTITY = -3;
+    private static final String PRODUCT_ID = "3";
 
     private CartService httpSessionCartService;
     private ProductDao productDao;
@@ -75,7 +74,7 @@ public class HttpSessionCartServiceImplTest {
         assertEquals(cart, resultCart);
     }
 
-    @Test(expected = IdNotFoundException.class)
+    @Test(expected = ProductIdNotFoundException.class)
     public void addProductShouldThrowIdNotFoundExceptionWhenProductIdIsNull() {
         httpSessionCartService.addProduct(request, null, POSITIVE_QUANTITY);
     }

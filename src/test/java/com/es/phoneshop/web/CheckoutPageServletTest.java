@@ -25,8 +25,17 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CheckoutPageServletTest {
-    public static final int WANTED_NUMBER_OF_INVOCATIONS = 3;
-    public static final String CORRECT_PARAMETER = "a";
+    private static final int WANTED_NUMBER_OF_INVOCATIONS = 3;
+    private static final String CORRECT_PARAMETER = "a";
+    private static final String ORDER_ATTRIBUTE = "order";
+    private static final String CART_ITEM_LIST_ATTRIBUTE = "cartItemList";
+    private static final String TOTAL_PRICE_ATTRIBUTE = "totalPrice";
+    private static final String DELIVERY_COST_ATTRIBUTE = "deliveryCost";
+    private static final String DELIVERY_DATES_ATTRIBUTE = "deliveryDates";
+    private static final String ORDER_LIST_ATTRIBUTE = "orderList";
+
+    private CheckoutPageServlet servlet = new CheckoutPageServlet();
+
     @Mock
     private HttpServletRequest request;
 
@@ -41,15 +50,6 @@ public class CheckoutPageServletTest {
 
     @Mock
     private HttpSession session;
-
-    public static final String ORDER_ATTRIBUTE = "order";
-    private static final String CART_ITEM_LIST_ATTRIBUTE = "cartItemList";
-    private static final String TOTAL_PRICE_ATTRIBUTE = "totalPrice";
-    private static final String DELIVERY_COST_ATTRIBUTE = "deliveryCost";
-    private static final String DELIVERY_DATES_ATTRIBUTE = "deliveryDates";
-    private static final String ORDER_LIST_ATTRIBUTE = "orderList";
-
-    private CheckoutPageServlet servlet = new CheckoutPageServlet();
 
     @Before
     public void setup() throws ServletException {

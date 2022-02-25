@@ -1,5 +1,7 @@
 package com.es.phoneshop.model.cart;
 
+import org.apache.commons.lang3.SerializationUtils;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,5 +35,9 @@ public class Cart implements Serializable {
 
     public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public Cart clone() throws RuntimeException {
+        return SerializationUtils.clone(this);
     }
 }

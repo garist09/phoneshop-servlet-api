@@ -130,6 +130,11 @@
   </error-page>
 
   <error-page>
+    <error-code>429</error-code>
+    <location>/WEB-INF/pages/error429.jsp</location>
+  </error-page>
+
+  <error-page>
     <error-code>500</error-code>
     <location>/WEB-INF/pages/error500.jsp</location>
   </error-page>

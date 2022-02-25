@@ -11,7 +11,7 @@ import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 
 public class ErrorProductNotFoundServlet extends HttpServlet {
     private static final String path = "/WEB-INF/pages/errorProductNotFound.jsp";
-    public static final String MESSAGE = "message";
+    private static final String MESSAGE = "message";
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -22,6 +22,7 @@ public class ErrorProductNotFoundServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Exception attribute = (Exception) request.getAttribute(ERROR_EXCEPTION);
         request.setAttribute(MESSAGE, attribute.getClass().toString());
+
         request.getRequestDispatcher(path).forward(request, response);
     }
 }

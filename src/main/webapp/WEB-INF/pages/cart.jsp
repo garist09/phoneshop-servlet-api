@@ -85,7 +85,7 @@
         </table>
         <p>
         <form method="get" action="${pageContext.request.contextPath}/products/cart/checkout">
-            <button name="order" type="submit">Place an order</button>
+            <button type="submit">Place an order</button>
         </form>
         </p>
     </c:if>

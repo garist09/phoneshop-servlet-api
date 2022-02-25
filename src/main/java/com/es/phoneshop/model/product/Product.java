@@ -14,7 +14,7 @@ import java.util.UUID;
 
 
 public class Product implements Serializable {
-    public static final int RANDOM_SEED = 1;
+    private static final int RANDOM_SEED = 1;
     private static final Random random;
 
     private String id;

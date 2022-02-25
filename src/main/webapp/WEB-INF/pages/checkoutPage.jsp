@@ -7,16 +7,23 @@
 <jsp:useBean id="totalPrice" type="java.math.BigDecimal" scope="request"/>
 <jsp:useBean id="deliveryCost" type="java.math.BigDecimal" scope="request"/>
 <jsp:useBean id="deliveryDates" type="java.lang.String[]" scope="request"/>
-<tags:master pageTitle="Checkout page">
+<tags:master pageTitle="Checkout page" >
     <c:if test="${not empty cartItemList}">
         <div class="text-header">
             Making an order
         </div>
         <br>
-        <c:if test = "${not empty errors}">
-            <c:forEach var="errorField" items="${errors}">
+        <c:if test = "${not empty emptyFieldErrors}">
+            <c:forEach var="errorField" items="${emptyFieldErrors}">
                 <p class="red">
                     The ${errorField} field is not filled in
+                </p>
+            </c:forEach>
+        </c:if>
+        <c:if test = "${not empty incorrectFieldErrors}">
+            <c:forEach var="errorField" items="${incorrectFieldErrors}">
+                <p class="red">
+                    The ${errorField} field is incorrect
                 </p>
             </c:forEach>
         </c:if>
@@ -27,7 +34,7 @@
                         First name
                     </td>
                     <td>
-                        <input required placeholder="First name" type="text" name="firstName" value="${not empty param.firstName ? param.firstName : ""}">
+                        <input required placeholder="First name" type="text" name="firstName" value="${enteredFirstName}">
                         <span class="required">*</span>
                     </td>
                 </tr>
@@ -37,7 +44,7 @@
                     </td>
                     <td>
                         <div>
-                            <input required placeholder="Last name" type="text" name="lastName" value="${not empty param.lastName ? param.lastName : ""}">
+                            <input required placeholder="Last name" type="text" name="lastName" value="${enteredLastName}">
                             <span class="required">*</span>
                         </div>
                     </td>
@@ -47,7 +54,7 @@
                         Phone number
                     </td>
                     <td>
-                        <input required placeholder="Phone number" name="phoneNumber" type="tel" value="${not empty param.phoneNumber ? param.phoneNumber : ""}">
+                        <input required placeholder="Phone number" name="phoneNumber" type="tel" value="${enteredPhoneNumber}">
                         <span class="required">*</span>
                     </td>
                 </tr>
@@ -56,7 +63,7 @@
                         Delivery address
                     </td>
                     <td>
-                        <input required placeholder="Delivery address" type="text" name="deliveryAddress" value="${not empty param.deliveryAddress ? param.deliveryAddress : ""}">
+                        <input required placeholder="Delivery address" type="text" name="deliveryAddress" value="${enteredDeliveryAddress}">
                         <span class="required">*</span>
                     </td>
                 </tr>

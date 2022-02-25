@@ -1,22 +1,23 @@
 package com.es.phoneshop.service.impl;
 
-import com.es.phoneshop.dao.ArrayListOrderDao;
-import com.es.phoneshop.dao.OrderDao;
 import com.es.phoneshop.model.cart.Cart;
-import com.es.phoneshop.model.cart.CartItem;
 import com.es.phoneshop.model.order.Order;
 import com.es.phoneshop.service.OrderService;
 
 import java.math.BigDecimal;
 import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.ResourceBundle;
 
 public class OrderServiceImpl implements OrderService {
+    private static final String CONSTANT_PROPERTY_FILE_NAME = "constant";
+    private static final String DELIVERY_COST_VALUE = "delivery.cost";
+
     private static OrderService instance;
-    OrderDao orderDao;
+
+    private ResourceBundle resourceBundle;
 
     private OrderServiceImpl() {
-        orderDao = ArrayListOrderDao.getInstance();
+        resourceBundle = ResourceBundle.getBundle(CONSTANT_PROPERTY_FILE_NAME);
     }
 
     public static OrderService getInstance() {
@@ -29,15 +30,15 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order createOrderFromCart(Cart cart) {
         Order order = new Order();
-        order.setCartItemList(cart.getCartItems().stream().map(cartItem -> (CartItem) cartItem.clone())
-                        .collect(Collectors.toList()))
-                .setSubtotal(cart.getTotalPrice())
-                .setDeliveryCost(calculateDeliveryCost())
-                .setCartTotal(order.getSubtotal().add(order.getDeliveryCost()));
+        Cart newCart = cart.clone();
+        order.setCartItemList(newCart.getCartItems());
+        order.setSubtotal(newCart.getTotalPrice());
+        order.setDeliveryCost(calculateDeliveryCost());
+        order.setCartTotal(order.getSubtotal().add(order.getDeliveryCost()));
         return order;
     }
 
-    private static BigDecimal calculateDeliveryCost() {
-        return new BigDecimal(30);
+    private BigDecimal calculateDeliveryCost() {
+        return new BigDecimal(resourceBundle.getString(DELIVERY_COST_VALUE));
     }
 }

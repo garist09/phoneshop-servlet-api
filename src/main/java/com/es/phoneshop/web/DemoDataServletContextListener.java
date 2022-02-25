@@ -16,8 +16,8 @@ import java.util.Currency;
 import java.util.List;
 
 public class DemoDataServletContextListener implements ServletContextListener {
-    public static final String INSERT_DEMO_DATA = "insertDemoData";
-    public static final String FAILED = "Failed to insert demo data";
+    private static final String INSERT_DEMO_DATA = "insertDemoData";
+    private static final String FAILED_MESSAGE = "Failed to insert demo data";
 
     private ProductDao productDao;
 
@@ -33,7 +33,7 @@ public class DemoDataServletContextListener implements ServletContextListener {
                 try {
                     productDao.save(product);
                 } catch (ProductNotFoundException e) {
-                    throw new RuntimeException(FAILED, e);
+                    throw new RuntimeException(FAILED_MESSAGE, e);
                 }
             }
         }

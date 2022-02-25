@@ -41,7 +41,8 @@ public class PriceHistoryItem implements Serializable {
             return false;
         }
         PriceHistoryItem secondPriceHistoryItem = (PriceHistoryItem) secondObject;
-        return Objects.equals(startDate, secondPriceHistoryItem.startDate) && Objects.equals(price, secondPriceHistoryItem.price);
+        return Objects.equals(startDate, secondPriceHistoryItem.startDate)
+                && Objects.equals(price, secondPriceHistoryItem.price);
     }
 
     @Override

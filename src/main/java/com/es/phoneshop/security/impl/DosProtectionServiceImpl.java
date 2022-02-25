@@ -1,39 +1,48 @@
 package com.es.phoneshop.security.impl;
 
 import com.es.phoneshop.security.DosProtectionService;
+import org.apache.commons.lang3.math.NumberUtils;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.ResourceBundle;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 
 public class DosProtectionServiceImpl implements DosProtectionService {
-    private static final Object lock;
-    private static final long THRESHOLD = 10;
-    public static final long START_MAP_COUNT = 1L;
-    public static final int TIME_TO_RESET_REQUEST_COUNT_OF_USERS = 1;
-    public static final int TIME_TO_CLEAR_BANNED_IP = 30;
+    private static final Object LOCK;
+    private static final long THRESHOLD;
+    private static final long START_MAP_COUNT = 1L;
+    private static final int TIME_TO_RESET_REQUEST_COUNT_OF_USERS = 1;
+    private static final int TIME_TO_CLEAR_BANNED_IP;
+    private static final ResourceBundle resourceBundle;
+    private static final String CONSTANT_PROPERTIES = "constant";
+    private static final String THRESHOLD_VALUE_PROPERTY = "threshold.value";
+    private static final String TIME_TO_CLEAR_BANNED_IP_PROPERTY = "time.to.clear.banned.ip";
+
     private static DosProtectionService instance;
-    private static Date startDate;
-    private static Date endDate;
+    private static LocalDateTime startDate;
+
     private Map<String, Long> countMap;
-    private Map<String, Long> bannedIp;
+    private Map<String, LocalDateTime> bannedIp;
 
     static {
-        lock = new Object();
+        LOCK = new Object();
+        resourceBundle = ResourceBundle.getBundle(CONSTANT_PROPERTIES);
+        THRESHOLD = Long.parseLong(resourceBundle.getString(THRESHOLD_VALUE_PROPERTY));
+        TIME_TO_CLEAR_BANNED_IP = Integer.parseInt(resourceBundle.getString(TIME_TO_CLEAR_BANNED_IP_PROPERTY));
     }
 
     private DosProtectionServiceImpl() {
         countMap = new ConcurrentHashMap<>();
         bannedIp = new ConcurrentHashMap<>();
-        startDate = new Date();
+        startDate = LocalDateTime.now();
     }
 
     public static DosProtectionService getInstance() {
         if (Objects.isNull(instance)) {
-            synchronized (lock) {
+            synchronized (LOCK) {
                 instance = new DosProtectionServiceImpl();
             }
         }
@@ -42,19 +51,16 @@ public class DosProtectionServiceImpl implements DosProtectionService {
 
     @Override
     public boolean isAllowed(String ip) {
-        endDate = new Date();
-        if ((endDate.getTime() - startDate.getTime()) > TimeUnit.MINUTES.toMillis(TIME_TO_RESET_REQUEST_COUNT_OF_USERS)) {
-            startDate = new Date();
+        if (ChronoUnit.MINUTES.between(startDate, LocalDateTime.now()) >= TIME_TO_RESET_REQUEST_COUNT_OF_USERS) {
+            startDate = LocalDateTime.now();
             countMap.clear();
         }
         if (!bannedIp.isEmpty()) {
-            Set<String> setOfBannedIp = Set.copyOf(bannedIp.keySet());
-            for (String currentIp : setOfBannedIp) {
-                Long bannedTime = bannedIp.get(currentIp);
-                if ((new Date().getTime() - bannedTime) > TimeUnit.MINUTES.toMillis(TIME_TO_CLEAR_BANNED_IP)) {
-                    bannedIp.remove(currentIp);
+            bannedIp.keySet().forEach(key -> {
+                if (ChronoUnit.MINUTES.between(bannedIp.get(key), LocalDateTime.now()) >= TIME_TO_CLEAR_BANNED_IP) {
+                    bannedIp.remove(key);
                 }
-            }
+            });
             if (Objects.nonNull(bannedIp.get(ip))) {
                 return false;
             }
@@ -64,10 +70,10 @@ public class DosProtectionServiceImpl implements DosProtectionService {
             countMap.put(ip, START_MAP_COUNT);
         } else {
             if (requestCount > THRESHOLD) {
-                bannedIp.put(ip, new Date().getTime());
+                bannedIp.put(ip, LocalDateTime.now());
                 return false;
             }
-            countMap.put(ip, requestCount + TIME_TO_RESET_REQUEST_COUNT_OF_USERS);
+            countMap.put(ip, requestCount + NumberUtils.INTEGER_ONE);
         }
         return true;
     }

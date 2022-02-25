@@ -22,6 +22,10 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class MiniCartServletTest {
+    private static final String attribute = "cart";
+
+    private MiniCartServlet servlet = new MiniCartServlet();
+
     @Mock
     private HttpServletRequest request;
 
@@ -36,10 +40,6 @@ public class MiniCartServletTest {
 
     @Mock
     private HttpSession session;
-
-    private static final String attribute = "cart";
-
-    private MiniCartServlet servlet = new MiniCartServlet();
 
     @Before
     public void setup() throws ServletException {

@@ -60,7 +60,9 @@ img.cart {
     display: inline;
     border: 0;
 }
-
+td.no-border {
+    border-color: white;
+}
 .plus-icon{
     background-image: url('../images/plus.png');
     background-size: 15px;

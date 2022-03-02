@@ -7,6 +7,7 @@ import com.es.phoneshop.model.sortenum.SortField;
 import com.es.phoneshop.model.sortenum.SortOrder;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -86,6 +87,19 @@ public class ArrayListProductDao implements ProductDao {
             return false;
         }
         return product.getStock() > 0;
+    }
+
+    @Override
+    public List<Product> findProducts(String productCode, BigDecimal minPrice, BigDecimal maxPrice, int minStock) {
+        Stream<Product> stream = products.stream();
+        if (!StringUtils.isBlank(productCode))
+            stream = stream.filter(product -> Objects.equals(product.getCode(), productCode));
+        if (Objects.nonNull(minPrice))
+            stream = stream.filter(product -> Objects.compare(minPrice, product.getPrice(), BigDecimal::compareTo) <= 0);
+        if (Objects.nonNull(maxPrice))
+            stream = stream.filter(product -> Objects.compare(maxPrice, product.getPrice(), BigDecimal::compareTo) >= 0);
+        return stream.filter(product -> minStock <= product.getStock())
+                .collect(Collectors.toList());
     }
 
     @Override

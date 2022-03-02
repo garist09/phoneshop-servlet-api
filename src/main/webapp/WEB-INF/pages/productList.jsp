@@ -10,6 +10,9 @@
     <input name="searchMobile" value="${param.searchMobile}">
     <button>Search</button>
   </form>
+  <form action="${pageContext.request.contextPath}/products/advancedSearch">
+    <button>Advanced search</button>
+  </form>
   <c:if test="${not empty error}">
     <p class="red">
         ${error}
